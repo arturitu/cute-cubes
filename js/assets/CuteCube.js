@@ -1,6 +1,13 @@
-var CuteCube = function () {
+var CuteCube = function (x,z,mesh) {
 
 	'use strict';
+
+	//Seek and Separation parameters
+	this.r = 0.25;
+	this.maxSpeed = 0.25;
+	this.maxForce = 0.03;
+	this.acceleration = new THREE.Vector2( 0, 0 );
+	this.velocity = new THREE.Vector2( 0, 0 );
 
 	//Eyes texture has 2x4 image atlas
 	this.eyesPerColumn = 4;
@@ -10,17 +17,9 @@ var CuteCube = function () {
 	this.mouthsPerColumn = 4;
 	this.mouthsPerRow = 4;
 
-	var scope = this;
-	var loader = new THREE.JSONLoader();
-	loader.load( 'assets/cuteCube.json', function( geometry, materials ) {
-
-		var mat = new THREE.MultiMaterial( materials );
-		// cuteCube = new THREE.Mesh ( geometry, mat );
-		THREE.Mesh.call( scope, geometry, mat );
-		scope.dispatchEvent( { type: 'ready' } );
-
-	} );
-
+	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
+	this.position.x = x;
+	this.position.z = z;
 
 };
 
@@ -42,4 +41,8 @@ CuteCube.prototype.changeMouth = function ( index ) {
 	this.material.materials[ 1 ].map.offset.x = 1 / this.mouthsPerRow * column;
 	this.material.materials[ 1 ].map.offset.y = - 1 / this.mouthsPerColumn * row;
 
+}
+
+CuteCube.prototype.applyBehaviors = function ( arr ) {
+	// console.log(arr);
 }

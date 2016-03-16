@@ -1,12 +1,13 @@
 'use strict'
 
-var clock, container, camera, scene, renderer, controls, effect, manager, listener, loader, loaderStroke;
+var clock, container, camera, scene, renderer, controls, effect, listener, loader;
+var vrMode = false;
 var cameraRails = new THREE.Object3D();
-var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
-var sound1, sound2, sound3;
 var	toogle = 0;
+var userHeight = 1.3;
+var totalCubes = 5;
 var sky;
-var cuteCube;
+var cuteCubeMesh;
 var cubesArr = [];
 var ground, positionalGround;
 var light, pointL1, pointL2, pointL3;
@@ -17,7 +18,7 @@ var initMaxRadius = 4;
 var originPos;
 var worldPosition = new THREE.Vector3();
 
-if ( WEBVR.isAvailable() === undefined ) {
+if ( WEBVR.isLatestAvailable() === false ) {
 
 	document.body.appendChild( WEBVR.getMessage() );
 
@@ -52,7 +53,7 @@ function init() {
 	scene = new THREE.Scene();
 
 	cameraRails.add ( camera );
-	cameraRails.position.y = 1.3;
+	cameraRails.position.y = userHeight;
 	originPos = worldPosition.setFromMatrixPosition( cameraRails.matrixWorld );
 
 	scene.add( cameraRails );
@@ -69,8 +70,19 @@ function init() {
 	container.appendChild( renderer.domElement );
 
 	// CONTROLS
-	controls = new THREE.VRControls( camera );
-	manager = new WebVRManager( renderer, effect, { hideButton: false } );
+	if ( navigator.getVRDisplays || navigator.getVRDevices ) {
+
+		controls = new THREE.VRControls( camera, vrFallback );
+		vrMode = true;
+
+	} else {
+
+		var dummy = new THREE.Mesh(new THREE.CylinderGeometry( 0.2, 0.2, userHeight, 32 ), new THREE.MeshPhongMaterial( {color: 0xffff00} ));
+		dummy.position.y = -userHeight/2;
+		cameraRails.add(dummy);
+		vrFallback();
+
+	}
 
 	var skyGeo = new THREE.SphereGeometry( 4500, 32, 15 );
 
@@ -90,7 +102,7 @@ function init() {
 
 	//Lights
 	light = new THREE.AmbientLight( 0x404040 );
-	// scene.add( light );
+	scene.add( light );
 
 	pointL1 = new THREE.PointLight( 0x404040, 2, 7 );
 	pointL1.position.set( 0, 3, 0 );
@@ -108,30 +120,8 @@ function init() {
 	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0x404040 } ) );
 	scene.add( positionalGround );
 
-	cuteCube = new CuteCube();
-	cuteCube.addEventListener( 'ready', cuteCubeReady.bind( this ) );
-
-	// 	//Load sounds
-	// 	sound1 = new THREE.PositionalAudio( listener );
-	// 	sound1.load( 'audio/base.ogg' );
-	// 	sound1.setRefDistance( 2.5 );
-	// 	sound1.source.loop = true;
-	// 	sound1.autoplay = true;
-	// 	cube.add( sound1 );
-	//
-	// 	sound2 = new THREE.PositionalAudio( listener );
-	// 	sound2.load( 'audio/mistery.ogg' );
-	// 	sound2.setRefDistance( 2 );
-	// 	sound2.source.loop = true;
-	// 	sound2.autoplay = true;
-	// 	// houseMistery.add( sound2 );
-	//
-	// 	sound3 = new THREE.PositionalAudio( listener );
-	// 	sound3.load( 'audio/equal.ogg' );
-	// 	sound3.setRefDistance( 1 );
-	// 	sound3.source.loop = true;
-	// 	sound3.autoplay = true;
-	// 	// pyramidEqual.add( sound3 );
+	cuteCubeMesh = new CuteCubeMesh();
+	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
 
 	onWindowResize();
 	window.addEventListener( 'resize', onWindowResize, false );
@@ -140,17 +130,16 @@ function init() {
 
 }
 
-function cuteCubeReady() {
+function cuteCubeMeshReady() {
 
-	for ( var i = 0; i < 50; i ++ ) {
-
-		//¿Random position and mass?
-		var cube = new THREE.Mesh( cuteCube.geometry, cuteCube.material.clone() );
-
+	for ( var i = 0; i < totalCubes; i ++ ) {
 		var randomAngle = Math.PI * 2 * Math.random();
 		var randomRadius = randomRange( initMinRadius, initMaxRadius );
-		cube.position.z = Math.sin( randomAngle ) * randomRadius;
-		cube.position.x = Math.cos( randomAngle ) * randomRadius;
+
+		var xRnd = Math.cos( randomAngle ) * randomRadius;
+		var zRnd = Math.sin( randomAngle ) * randomRadius;
+
+		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh );
 
 		cube.lookAt( new THREE.Vector3( originPos.x,0,originPos.z ) );
 		cubesArr.push( cube );
@@ -164,16 +153,28 @@ function randomRange ( min, max ) {
 
 	return min + Math.random() * ( max - min );
 
-};
+}
+
+function vrFallback() {
+		camera.position.set (-2, 2, -2 );
+		controls = new THREE.OrbitControls( camera );
+
+}
 
 function onWindowResize() {
 
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	if (vrMode) {
 
-	resolution.set( window.innerWidth, window.innerHeight );
+		effect.setSize(window.innerWidth, window.innerHeight);
+
+	} else {
+
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+	}
 
 }
 
@@ -184,33 +185,37 @@ function animate( timestamp ) {
 		return;
 
 	}
-	toogle += 0.02;
+
+	if ( vrMode ) {
+
+		effect.render( scene, camera );
+
+	} else {
+
+		renderer.render( scene, camera );
+
+	}
 	// Update VR headset position and apply to camera.
 	controls.update();
 
-	// Render the scene through the manager.
-	manager.render( scene, camera, timestamp );
-
 	requestAnimationFrame( animate );
 
+	for (var i = 0; i < cubesArr.length; i++) {
+		cubesArr[i].applyBehaviors(cubesArr);
+    // cubesArr[i].update();
+    // cubesArr[i].borders();
+    // cubesArr[i].display();
+	}
 }
 
 function pauseAll( bool ) {
 
 	isPaused = bool;
-	// if ( bool ) {
-	//
-	// 	sound1.pause();
-	// 	sound2.pause();
-	// 	sound3.pause();
-	//
-	// } else {
-	//
-	// 	animate();
-	// 	sound1.play();
-	// 	sound2.play();
-	// 	sound3.play();
-	//
-	// }
+
+	if( !isPaused ){
+
+		animate();
+
+	}
 
 }
