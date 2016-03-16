@@ -19,9 +19,6 @@ var CuteCube = function () {
 		THREE.Mesh.call( scope, geometry, mat );
 		scope.dispatchEvent( { type: 'ready' } );
 
-		// scope.changeEyes( 3 );
-		// scope.changeMouth( 16 );
-
 	} );
 
 
@@ -32,8 +29,7 @@ CuteCube.prototype = Object.create( THREE.Mesh.prototype );
 CuteCube.prototype.changeEyes = function ( index ) {
 
 	var row = Math.ceil( index / this.eyesPerRow ) - 1;
-	var column = ( index - 1 ) % this.eyesPerColumn;
-	console.log( row, column );
+	var column = ( index - 1 ) % this.eyesPerRow;
 	this.material.materials[ 2 ].map.offset.x = 1 / this.eyesPerRow * column;
 	this.material.materials[ 2 ].map.offset.y = - 1 / this.eyesPerColumn * row;
 
@@ -41,10 +37,9 @@ CuteCube.prototype.changeEyes = function ( index ) {
 
 CuteCube.prototype.changeMouth = function ( index ) {
 
-	var row = Math.ceil( index / this.mouthsPerRows ) - 1;
-	var column = ( index - 1 ) % this.mouthsPerColumns;
-
-	this.material.materials[ 1 ].map.offset.x = 1 / this.mouthsPerColumns * column;
-	this.material.materials[ 1 ].map.offset.y = - 1 / this.mouthsPerRows * row;
+	var row = Math.ceil( index / this.mouthsPerRow ) - 1;
+	var column = ( index - 1 ) % this.mouthsPerRow;
+	this.material.materials[ 1 ].map.offset.x = 1 / this.mouthsPerRow * column;
+	this.material.materials[ 1 ].map.offset.y = - 1 / this.mouthsPerColumn * row;
 
 }
