@@ -5,7 +5,7 @@ var vrMode = false;
 var cameraRails = new THREE.Object3D();
 var	toogle = 0;
 var userHeight = 1.3;
-var totalCubes = 5;
+var totalCubes = 10;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -18,6 +18,8 @@ var initMaxRadius = 4;
 var originPos;
 var worldPosition = new THREE.Vector3();
 
+var moveUp,moveDown,moveLeft,moveRight;
+
 if ( WEBVR.isLatestAvailable() === false ) {
 
 	document.body.appendChild( WEBVR.getMessage() );
@@ -25,6 +27,31 @@ if ( WEBVR.isLatestAvailable() === false ) {
 }
 
 init();
+
+function onDocumentKeyDown( event ) {
+
+	switch( event.keyCode ) {
+
+		case 37: moveLeft = true; break;
+		case 38: moveUp = true; break;
+		case 39: moveRight = true; break;
+		case 40: moveDown = true; break;
+
+	}
+
+}
+
+function onDocumentKeyUp( event ) {
+
+	switch( event.keyCode ) {
+
+		case 37: moveLeft = false; break;
+		case 38: moveUp = false; break;
+		case 39: moveRight = false; break;
+		case 40: moveDown = false; break;
+
+	}
+}
 
 function init() {
 
@@ -52,9 +79,8 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	cameraRails.add ( camera );
-	cameraRails.position.y = userHeight;
-	originPos = worldPosition.setFromMatrixPosition( cameraRails.matrixWorld );
+	// cameraRails.add ( camera );
+	// cameraRails.position.y = userHeight;
 
 	scene.add( cameraRails );
 
@@ -78,8 +104,12 @@ function init() {
 	} else {
 
 		var dummy = new THREE.Mesh(new THREE.CylinderGeometry( 0.2, 0.2, userHeight, 32 ), new THREE.MeshPhongMaterial( {color: 0xffff00} ));
-		dummy.position.y = -userHeight/2;
+		dummy.position.y = userHeight/2;
 		cameraRails.add(dummy);
+
+		document.addEventListener( 'keydown', onDocumentKeyDown, false );
+		document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
 		vrFallback();
 
 	}
@@ -139,9 +169,8 @@ function cuteCubeMeshReady() {
 		var xRnd = Math.cos( randomAngle ) * randomRadius;
 		var zRnd = Math.sin( randomAngle ) * randomRadius;
 
-		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh );
+		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, cameraRails );
 
-		cube.lookAt( new THREE.Vector3( originPos.x,0,originPos.z ) );
 		cubesArr.push( cube );
 		scene.add( cube );
 
@@ -193,6 +222,20 @@ function animate( timestamp ) {
 	} else {
 
 		renderer.render( scene, camera );
+		// cameraRails.position.x = Math.sin(timestamp/1000);
+		// cameraRails.position.z = Math.cos(timestamp/1000);
+		if( moveLeft ){
+			cameraRails.position.x += 0.01;
+		}
+		if( moveRight ){
+			cameraRails.position.x -= 0.01;
+		}
+		if( moveUp ){
+			cameraRails.position.z += 0.01;
+		}
+		if( moveDown ){
+			cameraRails.position.z -= 0.01;
+		}
 
 	}
 	// Update VR headset position and apply to camera.
@@ -202,9 +245,9 @@ function animate( timestamp ) {
 
 	for (var i = 0; i < cubesArr.length; i++) {
 		cubesArr[i].applyBehaviors(cubesArr);
-    // cubesArr[i].update();
-    // cubesArr[i].borders();
-    // cubesArr[i].display();
+		cubesArr[i].update();
+		var godPos = worldPosition.setFromMatrixPosition( cameraRails.matrixWorld );
+		cubesArr[i].lookAt( new THREE.Vector3( godPos.x,0,godPos.z ) );
 	}
 }
 
@@ -216,6 +259,8 @@ function pauseAll( bool ) {
 
 		animate();
 
-	}
+}
+
+
 
 }
