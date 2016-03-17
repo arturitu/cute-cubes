@@ -153,6 +153,10 @@ function init() {
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
 
+	if ( WEBVR.isAvailable() === true ) {
+					document.body.appendChild( WEBVR.getButton( effect ) );
+				}
+				
 	onWindowResize();
 	window.addEventListener( 'resize', onWindowResize, false );
 
@@ -169,7 +173,7 @@ function cuteCubeMeshReady() {
 		var xRnd = Math.cos( randomAngle ) * randomRadius;
 		var zRnd = Math.sin( randomAngle ) * randomRadius;
 
-		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, cameraRails );
+		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, camera );
 
 		cubesArr.push( cube );
 		scene.add( cube );
