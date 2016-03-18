@@ -146,7 +146,7 @@ function cuteCubeMeshReady() {
 		var xRnd = Math.cos( randomAngle ) * randomRadius;
 		var zRnd = Math.sin( randomAngle ) * randomRadius;
 
-		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, camera );
+		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, camera, listener );
 		cube.name = 'cube' + i;
 		cubesArr.push( cube );
 		scene.add( cube );
@@ -226,19 +226,11 @@ function pauseAll( bool ) {
 
 		animate();
 
-		for ( var i = 0; i < cubesArr.length; i ++ ) {
+	}
 
-			cubesArr[ i ].wakeUp();
+	for ( var i = 0; i < cubesArr.length; i ++ ) {
 
-		}
-
-	}else {
-
-		for ( var i = 0; i < cubesArr.length; i ++ ) {
-
-			cubesArr[ i ].sleep();
-
-		}
+		cubesArr[ i ].pauseAll( bool );
 
 	}
 

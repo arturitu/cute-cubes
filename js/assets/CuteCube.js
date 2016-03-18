@@ -1,4 +1,4 @@
-var CuteCube = function ( x, z, mesh, godtoFollow ) {
+var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 
 	'use strict';
 
@@ -13,85 +13,16 @@ var CuteCube = function ( x, z, mesh, godtoFollow ) {
 	this.desiredSeparation = 0.3;
 	this.godToFollow = godtoFollow;
 
-	//Eyes texture has 2x4 image atlas
-	this.eyesPerColumn = 4;
-	this.eyesPerRow = 2;
-
-	//Mouth texture has 4x4 image atlas
-	this.mouthsPerColumn = 4;
-	this.mouthsPerRow = 4;
-
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
 	this.position.x = x;
 	this.position.z = z;
 
-	this.soundLaugh = new THREE.PositionalAudio( listener );
-	this.soundLaugh.load( 'audio/hehehe.ogg' );
-	// this.sound.setRefDistance( 2.5 );
-	this.soundLaugh.source.loop = false;
-	this.soundLaugh.autoplay = false;
-	this.add( this.soundLaugh );
-
-	this.soundClash = new THREE.PositionalAudio( listener );
-	this.soundClash.load( 'audio/guegue.ogg' );
-	// this.sound.setRefDistance( 2.5 );
-	this.soundClash.source.loop = false;
-	this.soundClash.autoplay = false;
-	this.add( this.soundClash );
-
-	//mood = expression + sound
-	//laugh / clash
-	this.mood = 'laugh';
-	this.timerMood = setInterval( this.makeMood.bind( this ), ( Math.random() * 5000 ) + 1000 );
-
-	this.expression;
+	this.moodManager = new MoodManager( this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
+	this.add( this.moodManager );
 
 };
 
 CuteCube.prototype = Object.create( THREE.Mesh.prototype );
-
-CuteCube.prototype.makeMood = function () {
-
-	// console.log( this.name, ': ', this.mood );
-	switch ( this.mood ) {
-		case 'laugh':
-			if ( this.soundLaugh.sourceType !== 'empty' && ! this.soundLaugh.isPlaying ) {
-
-				this.soundLaugh.play();
-				if ( this.soundClash.isPlaying ) {
-
-					this.soundClash.stop();
-
-				}
-
-			}
-			break;
-		case 'clash':
-			if ( this.soundClash.sourceType !== 'empty' && ! this.soundClash.isPlaying ) {
-
-				this.soundClash.play();
-				if ( this.soundLaugh.isPlaying ) {
-
-					this.soundLaugh.stop();
-
-				}
-
-			}
-			break;
-	}
-
-}
-
-CuteCube.prototype.laugh = function () {
-
-	if ( this.soundLaugh.sourceType !== 'empty' && ! this.soundLaugh.isPlaying ) {
-
-		this.soundLaugh.play();
-
-	}
-	setTimeout( this.laugh.bind( this ), ( Math.random() * 5000 ) + 1000 );
-
-}
 
 //INIT CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 CuteCube.prototype.applyBehaviors = function ( vehicles ) {
@@ -148,11 +79,11 @@ CuteCube.prototype.separate = function ( vehicles ) {
 		sum.sub( this.velocity );
 		sum.setLength( this.maxForce );
 
-		this.mood = 'clash';
+		this.moodManager.mode = 'clash';
 
 	}else {
 
-		this.mood = 'laugh';
+		this.moodManager.mood = 'laugh';
 
 	}
 	return sum;
@@ -190,95 +121,11 @@ CuteCube.prototype.update = function ( godPosition ) {
 	this.acceleration.multiplyScalar( 0 );
 	this.position.y = 0;
 	// console.log(this.position);
-	this.updateExpressions();
+	this.moodManager.update();
 
 }
 //END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
-CuteCube.prototype.updateExpressions = function () {
 
-	console.log( this.name, this.mood );
-
-	switch ( this.mood ) {
-		case 'laugh':
-			if ( this.soundLaugh.isPlaying ) {
-
-				this.renderExpression( 'laugh' );
-
-			}else {
-
-				this.renderExpression( 'idle' );
-
-			}
-			break;
-		case 'clash':
-			if ( this.soundClash.isPlaying ) {
-
-				this.renderExpression( 'clash' );
-
-			}else {
-
-				this.renderExpression( 'idle' );
-
-			}
-			break;
-	}
-
-}
-
-CuteCube.prototype.renderExpression = function ( expression ) {
-
-	if ( this.expression === expression ) {
-
-		return;
-
-	}
-	this.expression = expression;
-	// console.log( this.name, expression );
-	switch ( expression ) {
-		case 'idle':
-			this.changeEyes( 1 );
-			this.changeMouth( 9 );
-			break;
-		case 'laugh':
-			this.changeEyes( 7 );
-			this.changeMouth( 1 );
-			break;
-		case 'clash':
-			this.changeEyes( 6 );
-			this.changeMouth( 6 );
-			break;
-	}
-
-}
-//To control pause
-CuteCube.prototype.sleep = function () {
-
-	clearInterval( this.timerMood );
-
-}
-
-CuteCube.prototype.wakeUp = function () {
-
-
-	this.timerMood = setInterval( this.makeMood.bind( this ), ( Math.random() * 3000 ) + 1000 );
-
-}
-
-//To control moods
-CuteCube.prototype.changeEyes = function ( index ) {
-
-	var row = Math.ceil( index / this.eyesPerRow ) - 1;
-	var column = ( index - 1 ) % this.eyesPerRow;
-	this.material.materials[ 1 ].map.offset.x = 1 / this.eyesPerRow * column;
-	this.material.materials[ 1 ].map.offset.y = - 1 / this.eyesPerColumn * row;
-
-}
-
-CuteCube.prototype.changeMouth = function ( index ) {
-
-	var row = Math.ceil( index / this.mouthsPerRow ) - 1;
-	var column = ( index - 1 ) % this.mouthsPerRow;
-	this.material.materials[ 2 ].map.offset.x = 1 / this.mouthsPerRow * column;
-	this.material.materials[ 2 ].map.offset.y = - 1 / this.mouthsPerColumn * row;
-
+CuteCube.prototype.pauseAll = function ( bool ) {
+	this.moodManager.pauseAll( bool );
 }
