@@ -5,7 +5,7 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 	//Seek and Separation parameters
 	this.radiusSecureArea = 5;
 	this.maxSpeed = 0.005;
-	this.maxForce = 0.0065;
+	this.maxForce = 0.0015;
 	this.acceleration = new THREE.Vector3();
 	this.velocity = new THREE.Vector3();
 	this.separateFactor = 0.1;
@@ -14,6 +14,8 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 	this.godToFollow = godtoFollow;
 
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
+	this.castShadow = true;
+	this.receiveShadow = true;
 	this.position.x = x;
 	this.position.z = z;
 
@@ -80,10 +82,6 @@ CuteCube.prototype.separate = function ( vehicles ) {
 		sum.setLength( this.maxForce );
 
 		this.moodManager.mode = 'clash';
-
-	}else {
-
-		this.moodManager.mood = 'laugh';
 
 	}
 	return sum;

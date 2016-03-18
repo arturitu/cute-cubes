@@ -12,10 +12,12 @@ var ground, positionalGround;
 var light, pointL1, pointL2, pointL3;
 var lightsArr = [];
 var isPaused = false;
-var initMinRadius = 2;
-var initMaxRadius = 4;
+var initMinRadius = 1;
+var initMaxRadius = 2;
 var originPos;
 var worldPosition = new THREE.Vector3();
+
+var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 2048;
 
 if ( WEBVR.isLatestAvailable() === false ) {
 
@@ -57,6 +59,8 @@ function init() {
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.sortObjects = false;
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 	effect = new THREE.VREffect( renderer );
 	effect.setSize( window.innerWidth, window.innerHeight );
@@ -101,23 +105,27 @@ function init() {
 	scene.add( skyBoxR );
 
 	//Lights
-	light = new THREE.AmbientLight( 0x404040 );
+	light = new THREE.AmbientLight( 0x404050, 1 );
 	scene.add( light );
 
-	pointL1 = new THREE.PointLight( 0x404040, 2, 7 );
-	pointL1.position.set( 0, 3, 0 );
+	pointL1 = new THREE.PointLight( 0x404050, 1, 30 );
+	pointL1.castShadow = true;
+	pointL1.shadow.camera.near = 1;
+	pointL1.shadow.camera.far = 30;
+	// pointL1.shadowCameraVisible = true;
+	pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+	pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
+	pointL1.shadow.bias = 0.001;
+	pointL1.position.set( 0, 3, -2 );
 	scene.add( pointL1 );
 
 	//Ground
-	var planeGeometry = new THREE.PlaneBufferGeometry( 50, 50, 50, 50 );
-	planeGeometry.rotateX( - Math.PI / 2 );
 
-	ground = new THREE.Mesh( planeGeometry, new THREE.MeshLambertMaterial( { wireframe: true } ) );
-	// scene.add( ground );
-
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 4, 3, 4, 3 );
+	var planePosGeometry = new THREE.PlaneBufferGeometry( 30, 30, 1, 1 );
 	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0x404040 } ) );
+	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshPhongMaterial( { color: 0xeeeeee, shininess: 0,
+					specular: 0x111111 } ) );
+	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
 
 	cuteCubeMesh = new CuteCubeMesh();
@@ -163,7 +171,7 @@ function randomRange ( min, max ) {
 
 function vrFallback() {
 
-	camera.position.set ( - 2, 2, - 2 );
+	camera.position.set ( 0, 0, 1.7 );
 	controls = new THREE.OrbitControls( camera );
 
 }
