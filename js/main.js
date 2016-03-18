@@ -23,6 +23,7 @@ if ( WEBVR.isLatestAvailable() === false ) {
 
 }
 
+
 init();
 
 function init() {
@@ -44,7 +45,8 @@ function init() {
 
 	clock = new THREE.Clock();
 
-	camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.05, 1000000 );
+	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 1000000 );
+	camera.layers.enable( 1 );
 
 	listener = new THREE.AudioListener();
 	camera.add( listener );
@@ -74,21 +76,29 @@ function init() {
 
 	}
 
-	var skyGeo = new THREE.SphereGeometry( 4500, 32, 15 );
+	var skyGeo = new THREE.SphereGeometry( 450, 32, 15 );
 
 	//Sky
-	loader = new THREE.TextureLoader();
+	// loader = new THREE.TextureLoader();
+	//
+	// loader.load( 'assets/stars.jpg', function( texture ) {
+	//
+	// 	texture.minFilter = THREE.LinearFilter;
+	// 	texture.magFilter = THREE.LinearFilter;
+	//
+	// 	sky = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : texture, side: THREE.BackSide } ) );
+	// 	sky.rotation.y = Math.PI / 2;
+	// 	// scene.add( sky );
+	//
+	// } );
+	var skyBox = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoleft.png' ), side: THREE.BackSide } ) );
+	skyBox.layers.set( 1 );
+	scene.add( skyBox );
 
-	loader.load( 'assets/stars.jpg', function( texture ) {
 
-		texture.minFilter = THREE.LinearFilter;
-		texture.magFilter = THREE.LinearFilter;
-
-		sky = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : texture, side: THREE.BackSide } ) );
-		sky.rotation.y = Math.PI / 2;
-		// scene.add( sky );
-
-	} );
+	var skyBoxR = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoright.png' ), side: THREE.BackSide } ) );
+	skyBoxR.layers.set( 2 );
+	scene.add( skyBoxR );
 
 	//Lights
 	light = new THREE.AmbientLight( 0x404040 );
