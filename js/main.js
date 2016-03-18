@@ -4,7 +4,7 @@ var clock, container, camera, scene, renderer, controls, effect, listener, loade
 var vrMode = false;
 var	toogle = 0;
 var userHeight = 1.3;
-var totalCubes = 2;
+var totalCubes = 20;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -13,11 +13,11 @@ var light, pointL1, pointL2, pointL3;
 var lightsArr = [];
 var isPaused = false;
 var initMinRadius = 1;
-var initMaxRadius = 2;
+var initMaxRadius = 5;
 var originPos;
 var worldPosition = new THREE.Vector3();
 
-var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 2048;
+// var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 2048;
 
 if ( WEBVR.isLatestAvailable() === false ) {
 
@@ -105,25 +105,24 @@ function init() {
 	scene.add( skyBoxR );
 
 	//Lights
-	light = new THREE.AmbientLight( 0x404050, 1 );
+	light = new THREE.AmbientLight( 0x404050, 3 );
 	scene.add( light );
 
-	pointL1 = new THREE.PointLight( 0x404050, 1, 30 );
+	pointL1 = new THREE.PointLight( 0x404050, 3, 0 );
 	pointL1.castShadow = true;
 	pointL1.shadow.camera.near = 1;
 	pointL1.shadow.camera.far = 30;
-	// pointL1.shadowCameraVisible = true;
-	pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
-	pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
+	// pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+	// pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 	pointL1.shadow.bias = 0.001;
-	pointL1.position.set( 0, 3, -2 );
+	pointL1.position.set( -3, 5, -3 );
 	scene.add( pointL1 );
 
 	//Ground
 
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 30, 30, 1, 1 );
+	var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
 	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshPhongMaterial( { color: 0xeeeeee, shininess: 0,
+	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshPhongMaterial( { color: 0xffffff, shininess: 10,
 					specular: 0x111111 } ) );
 	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
