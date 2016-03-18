@@ -4,7 +4,7 @@ var clock, container, camera, scene, renderer, controls, effect, listener, loade
 var vrMode = false;
 var	toogle = 0;
 var userHeight = 1.3;
-var totalCubes = 10;
+var totalCubes = 2;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -86,7 +86,7 @@ function init() {
 
 		sky = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : texture, side: THREE.BackSide } ) );
 		sky.rotation.y = Math.PI / 2;
-		scene.add( sky );
+		// scene.add( sky );
 
 	} );
 
@@ -103,7 +103,7 @@ function init() {
 	planeGeometry.rotateX( - Math.PI / 2 );
 
 	ground = new THREE.Mesh( planeGeometry, new THREE.MeshLambertMaterial( { wireframe: true } ) );
-	scene.add( ground );
+	// scene.add( ground );
 
 	var planePosGeometry = new THREE.PlaneBufferGeometry( 4, 3, 4, 3 );
 	planePosGeometry.rotateX( - Math.PI / 2 );
@@ -137,7 +137,7 @@ function cuteCubeMeshReady() {
 		var zRnd = Math.sin( randomAngle ) * randomRadius;
 
 		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, camera );
-
+		cube.name = 'cube' + i;
 		cubesArr.push( cube );
 		scene.add( cube );
 
@@ -215,6 +215,20 @@ function pauseAll( bool ) {
 	if ( ! isPaused ) {
 
 		animate();
+
+		for ( var i = 0; i < cubesArr.length; i ++ ) {
+
+			cubesArr[ i ].wakeUp();
+
+		}
+
+	}else {
+
+		for ( var i = 0; i < cubesArr.length; i ++ ) {
+
+			cubesArr[ i ].sleep();
+
+		}
 
 	}
 
