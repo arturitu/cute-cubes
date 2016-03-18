@@ -5,8 +5,8 @@ var CuteCube = function ( x, z, mesh, godtoFollow ) {
 	this.godToFollow = godtoFollow;
 	//Seek and Separation parameters
 	this.radiusSecureArea = 5;
-	this.maxSpeed = 0.01;
-	this.maxForce = 0.013;
+	this.maxSpeed = 0.005;
+	this.maxForce = 0.0065;
 	this.acceleration = new THREE.Vector3();
 	this.velocity = new THREE.Vector3();
 
@@ -30,6 +30,7 @@ var CuteCube = function ( x, z, mesh, godtoFollow ) {
 
 CuteCube.prototype = Object.create( THREE.Mesh.prototype );
 
+//INIT CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 CuteCube.prototype.applyBehaviors = function ( vehicles ) {
 
 	// console.log(arr);
@@ -122,6 +123,7 @@ CuteCube.prototype.update = function ( godPosition ) {
 	// console.log(this.position);
 
 }
+//END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 
 CuteCube.prototype.changeEyes = function ( index ) {
 
