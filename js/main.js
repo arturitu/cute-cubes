@@ -264,7 +264,7 @@ function animate( timestamp ) {
 
 		cubesArr[ i ].applyBehaviors( cubesArr );
 		cubesArr[ i ].update();
-		var godPos = worldPosition.setFromMatrixPosition( cameraRails.matrixWorld );
+		var godPos = worldPosition.setFromMatrixPosition( camera.matrixWorld );
 		cubesArr[ i ].lookAt( new THREE.Vector3( godPos.x,0,godPos.z ) );
 
 	}

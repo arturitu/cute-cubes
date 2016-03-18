@@ -98,20 +98,6 @@ CuteCube.prototype.seek = function ( godPosition ) {
 	desired.setLength( this.maxSpeed );
 	// console.log(godPosition);
 
-	// if (this.position.x < this.radiusSecureArea) {
-	// desired = createVector(this.maxspeed, this.velocity.y);
-	// }
-	// else if (this.position.x > width -d) {
-	// desired = createVector(-this.maxspeed, this.velocity.y);
-	// }
-	//
-	// if (this.position.y < d) {
-	// desired = createVector(this.velocity.x, this.maxspeed);
-	// }
-	// else if (this.position.y > height-d) {
-	// desired = createVector(this.velocity.x, -this.maxspeed);
-	// }
-
 	// Steering = Desired minus velocity
 	var steer = new THREE.Vector3();
 	steer = steer.subVectors( desired, this.velocity );
