@@ -15,7 +15,7 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
 	this.castShadow = true;
-	this.receiveShadow = true;
+	this.receiveShadow = false;
 	this.position.x = x;
 	this.position.z = z;
 
