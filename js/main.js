@@ -4,7 +4,7 @@ var clock, container, camera, scene, renderer, controls, effect, listener, loade
 var vrMode = false;
 var	toogle = 0;
 var userHeight = 1.3;
-var totalCubes = 20;
+var totalCubes = 2;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -12,15 +12,17 @@ var ground, positionalGround;
 var light, pointL1, pointL2, pointL3;
 var lightsArr = [];
 var isPaused = false;
-var initMinRadius = 1;
-var initMaxRadius = 5;
+var initMinRadius = 2.1;
+var initMaxRadius = 3;
 var originPos;
 var worldPosition = new THREE.Vector3();
+var totalTime = 0;
 
-// var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 2048;
+var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
 
 if ( WEBVR.isLatestAvailable() === false ) {
-
+	SHADOW_MAP_WIDTH = 1024;
+	SHADOW_MAP_HEIGHT = 1024;
 	document.body.appendChild( WEBVR.getMessage() );
 
 }
@@ -83,18 +85,6 @@ function init() {
 	var skyGeo = new THREE.SphereGeometry( 450, 32, 15 );
 
 	//Sky
-	// loader = new THREE.TextureLoader();
-	//
-	// loader.load( 'assets/stars.jpg', function( texture ) {
-	//
-	// 	texture.minFilter = THREE.LinearFilter;
-	// 	texture.magFilter = THREE.LinearFilter;
-	//
-	// 	sky = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : texture, side: THREE.BackSide } ) );
-	// 	sky.rotation.y = Math.PI / 2;
-	// 	// scene.add( sky );
-	//
-	// } );
 	var skyBox = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoleft.png' ), side: THREE.BackSide } ) );
 	skyBox.layers.set( 1 );
 	scene.add( skyBox );
@@ -112,8 +102,8 @@ function init() {
 	pointL1.castShadow = true;
 	pointL1.shadow.camera.near = 1;
 	pointL1.shadow.camera.far = 30;
-	// pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
-	// pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
+	pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+	pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 	pointL1.shadow.bias = 0.001;
 	pointL1.position.set( -3, 5, -3 );
 	scene.add( pointL1 );
@@ -213,11 +203,18 @@ function animate( timestamp ) {
 	controls.update();
 
 	requestAnimationFrame( animate );
-
+	totalTime = Math.round(timestamp/1000);
+	// console.log(totalTime);
 	for ( var i = 0; i < cubesArr.length; i ++ ) {
 
+		if(totalTime > 60 && totalTime<120){
+			cubesArr[ i ].setSecureDistance(1);
+		}
+		if ( totalTime>120 ){
+			cubesArr[ i ].setSecureDistance(0.3);
+		}
 		cubesArr[ i ].applyBehaviors( cubesArr );
-		cubesArr[ i ].update();
+		cubesArr[ i ].update( timestamp );
 		var godPos = worldPosition.setFromMatrixPosition( camera.matrixWorld );
 		cubesArr[ i ].lookAt( new THREE.Vector3( godPos.x,0,godPos.z ) );
 

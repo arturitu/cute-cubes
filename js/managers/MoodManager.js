@@ -6,6 +6,7 @@ var MoodManager = function ( eyesMap, mouthMap, listener ) {
 
 	this.eyesMap = eyesMap;
 	this.mouthMap = mouthMap;
+
 	//Eyes texture has 2x4 image atlas
 	this.eyesPerColumn = 4;
 	this.eyesPerRow = 2;
@@ -31,7 +32,13 @@ var MoodManager = function ( eyesMap, mouthMap, listener ) {
 	//mode = expression + sound
 	//laugh / clash
 	this.mode = 'laugh';
-	this.timerMood = setInterval( this.makeMood.bind( this ), ( Math.random() * 5000 ) + 1000 );
+	this.isMoodActive = false;
+
+	this.timerIdle = Math.random()*500 + 500;
+	this.timerBlink = Math.random()*1000 + 500;
+
+	this.idleFrame = 0;
+	this.blinkFrame = 0;
 
 	this.expression;
 
@@ -82,59 +89,63 @@ MoodManager.prototype.laugh = function () {
 
 }
 
-MoodManager.prototype.update = function () {
+MoodManager.prototype.update = function ( timestamp ) {
 
-	// console.log( this.name, this.mood );
+	// if(this.parent.name === 'cube1' ){
 
-	switch ( this.mood ) {
-		case 'laugh':
-			if ( this.soundLaugh.isPlaying ) {
-
-				this.renderExpression( 'laugh' );
-
-			}else {
-
-				this.renderExpression( 'idle' );
-
-			}
-			break;
-		case 'clash':
-			if ( this.soundClash.isPlaying ) {
-
-				this.renderExpression( 'clash' );
-
-			}else {
-
-				this.renderExpression( 'idle' );
-
-			}
-			break;
+	var blinkFrameTmp = timestamp%this.timerBlink / this.timerBlink;
+	if ( this.blinkFrame > blinkFrameTmp ){
+		this.doBlink();
 	}
+	this.blinkFrame = blinkFrameTmp;
+
+
+	var idleFrameTmp = timestamp%this.timerIdle / this.timerIdle;
+	if ( this.idleFrame > idleFrameTmp ){
+		this.doIdle();
+	}
+	this.idleFrame = idleFrameTmp;
+
+
+	// switch ( this.mood ) {
+	// 	case 'laugh':
+	// 		if ( this.soundLaugh.isPlaying ) {
+	//
+	// 			this.renderExpression( 'laugh' );
+	//
+	// 		}else {
+	//
+	// 			this.renderExpression( 'idle' );
+	//
+	// 		}
+	// 		break;
+	// 	case 'clash':
+	// 		if ( this.soundClash.isPlaying ) {
+	//
+	// 			this.renderExpression( 'clash' );
+	//
+	// 		}else {
+	//
+	// 			this.renderExpression( 'idle' );
+	//
+	// 		}
+	// 		break;
+	// }
 
 }
 
-MoodManager.prototype.renderExpression = function ( expression ) {
+MoodManager.prototype.doBlink = function () {
 
-	if ( this.expression === expression ) {
+	this.renderExpression('blink');
 
-		return;
+}
 
-	}
-	this.expression = expression;
-	// console.log( this.name, expression );
-	switch ( expression ) {
-		case 'idle':
-			this.changeEyes( 1 );
-			this.changeMouth( 9 );
-			break;
-		case 'laugh':
-			this.changeEyes( 7 );
-			this.changeMouth( 1 );
-			break;
-		case 'clash':
-			this.changeEyes( 6 );
-			this.changeMouth( 6 );
-			break;
+MoodManager.prototype.doIdle = function () {
+
+	if( !this.isMoodActive ){
+
+		this.renderExpression('idle');
+
 	}
 
 }
@@ -143,9 +154,9 @@ MoodManager.prototype.renderExpression = function ( expression ) {
 MoodManager.prototype.pauseAll = function ( bool ) {
 
 	if ( bool ){
-			clearInterval( this.timerMood );
+
 	}else {
-		this.timerMood = setInterval( this.makeMood.bind( this ), ( Math.random() * 3000 ) + 1000 );
+
 	}
 
 }
@@ -166,5 +177,74 @@ MoodManager.prototype.changeMouth = function ( index ) {
 	var column = ( index - 1 ) % this.mouthsPerRow;
 	this.mouthMap.offset.x = 1 / this.mouthsPerRow * column;
 	this.mouthMap.offset.y = - 1 / this.mouthsPerColumn * row;
+
+}
+
+MoodManager.prototype.renderExpression = function ( expression ) {
+	// console.log(expression);
+	if ( this.expression === expression ) {
+
+		return;
+
+	}
+	this.expression = expression;
+	// console.log( this.name, expression );
+	switch ( expression ) {
+		case 'idle':
+				this.changeEyes( 1 );
+				this.changeMouth( 2 );
+			break;
+		case 'blink':
+			this.changeEyes( 5 );
+			break;
+		case 'clash_a':
+			this.changeEyes( 4 );
+			this.changeMouth( 3 );
+			break;
+		case 'clash_b':
+			this.changeEyes( 6 );
+			this.changeMouth( 4 );
+			break;
+		case 'guegue1':
+			this.changeEyes( 2 );
+			this.changeMouth( 11 );
+			break;
+		case 'guegue2':
+			this.changeEyes( 2 );
+			this.changeMouth( 12 );
+			break;
+		case 'laugh1':
+			this.changeEyes( 7 );
+			this.changeMouth( 1 );
+			break;
+		case 'laugh2':
+			this.changeEyes( 7 );
+			this.changeMouth( 14 );
+			break;
+		case 'phoneme_-':
+			this.changeMouth( 9 );
+			break;
+		case 'phoneme_a':
+			this.changeMouth( 10 );
+			break;
+		case 'phoneme_o':
+			this.changeMouth( 11 );
+			break;
+		case 'phoneme_e':
+			this.changeMouth( 12 );
+			break;
+		case 'phoneme_s':
+			this.changeMouth( 13 );
+			break;
+		case 'phoneme_l':
+			this.changeMouth( 14 );
+			break;
+		case 'phoneme_m':
+			this.changeMouth( 15 );
+			break;
+		case 'phoneme_f':
+			this.changeMouth( 16 );
+			break;
+	}
 
 }

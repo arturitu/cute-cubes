@@ -3,9 +3,10 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 	'use strict';
 
 	//Seek and Separation parameters
-	this.radiusSecureArea = 5;
+
+	this.secureDistanceToGod = 2;
 	this.maxSpeed = 0.005;
-	this.maxForce = 0.0065;
+	this.maxForce = 0.0048;
 	this.acceleration = new THREE.Vector3();
 	this.velocity = new THREE.Vector3();
 	this.separateFactor = 0.1;
@@ -14,14 +15,16 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 	this.godToFollow = godtoFollow;
 
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
+
 	this.castShadow = true;
 	this.receiveShadow = false;
 	this.position.x = x;
 	this.position.z = z;
 
+	this.prevPosition =  new THREE.Vector3();
+
 	this.moodManager = new MoodManager( this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
 	this.add( this.moodManager );
-
 };
 
 CuteCube.prototype = Object.create( THREE.Mesh.prototype );
@@ -92,10 +95,14 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 	var desired = new THREE.Vector3();
 	desired = desired.subVectors( godPosition, this.position );  // A vector pointing from the location to the target
-
-	// Normalize desired and scale to maximum speed
-	desired.setLength( this.maxSpeed );
-	// console.log(godPosition);
+	if( desired.length() < this.secureDistanceToGod ){
+		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
+    // desired.setLength(m);
+		desired.setLength(0);
+	}else{
+			// Normalize desired and scale to maximum speed
+		desired.setLength( this.maxSpeed );
+	}
 
 	// Steering = Desired minus velocity
 	var steer = new THREE.Vector3();
@@ -106,7 +113,7 @@ CuteCube.prototype.seek = function ( godPosition ) {
 }
 
 // Method to update location
-CuteCube.prototype.update = function ( godPosition ) {
+CuteCube.prototype.update = function ( timestamp ) {
 
 	// console.log(this.velocity);
 	// console.log(this.acceleration);
@@ -114,16 +121,30 @@ CuteCube.prototype.update = function ( godPosition ) {
 	this.velocity.add( this.acceleration );
 	// Limit speed
 	this.velocity.setLength( this.maxSpeed );
-	this.position.add( this.velocity );
+	// this.prevPosition = this.position.clone();
+	// this.prevPosition.add( this.velocity );
+	//
+	// console.log( Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z ) );
+	// var diff = Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z );
+	// if(diff > 0.003){
+		this.position.add( this.velocity );
+	// }
 	// Reset acceleration to 0 each cycle
 	this.acceleration.multiplyScalar( 0 );
 	this.position.y = 0;
 	// console.log(this.position);
-	this.moodManager.update();
+	this.moodManager.update( timestamp );
 
 }
 //END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 
 CuteCube.prototype.pauseAll = function ( bool ) {
 	this.moodManager.pauseAll( bool );
+}
+
+CuteCube.prototype.setSecureDistance = function ( i ) {
+	if( this.secureDistanceToGod !== i){
+		this.secureDistanceToGod = i;
+		// console.log(this.secureDistanceToGod);
+	}
 }
