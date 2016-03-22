@@ -18,6 +18,9 @@ var originPos;
 var worldPosition = new THREE.Vector3();
 var totalTime = 0;
 
+//For touch controls (fallback for testing without VR)
+var mouse = new THREE.Vector2();
+
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
 
 if ( WEBVR.isLatestAvailable() === false ) {
@@ -51,6 +54,7 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 1000000 );
 	camera.layers.enable( 1 );
+	camera.position.set ( 0, userHeight, 0 );
 
 	listener = new THREE.AudioListener();
 	camera.add( listener );
@@ -160,8 +164,10 @@ function randomRange ( min, max ) {
 
 function vrFallback() {
 
-	camera.position.set ( 0, 0, 1.7 );
-	controls = new THREE.OrbitControls( camera );
+	// controls = new THREE.OrbitControls( camera );
+	mouse.x = 0;
+	mouse.y = 0;
+	controls = new THREE.TouchControls( camera, mouse, 0 );
 
 }
 

@@ -107,6 +107,7 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 	var desired = new THREE.Vector3();
 	desired = desired.subVectors( godPosition, this.position );  // A vector pointing from the location to the target
+	console.log(this.secureDistanceToGod);
 	if( desired.length() < this.secureDistanceToGod ){
 		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
     // desired.setLength(m);
@@ -156,6 +157,5 @@ CuteCube.prototype.pauseAll = function ( bool ) {
 CuteCube.prototype.setSecureDistance = function ( i ) {
 	if( this.secureDistanceToGod !== i){
 		this.secureDistanceToGod = i;
-		// console.log(this.secureDistanceToGod);
 	}
 }
