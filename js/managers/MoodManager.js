@@ -35,7 +35,7 @@ var MoodManager = function ( eyesMap, mouthMap, listener ) {
 	this.isMoodActive = false;
 
 	this.timerIdle = Math.random()*500 + 500;
-	this.timerBlink = Math.random()*1000 + 500;
+	this.timerBlink = Math.random()*1000 + 3000;
 
 	this.idleFrame = 0;
 	this.blinkFrame = 0;

@@ -4,7 +4,7 @@ var clock, container, camera, scene, renderer, controls, effect, listener, loade
 var vrMode = false;
 var	toogle = 0;
 var userHeight = 1.3;
-var totalCubes = 2;
+var totalCubes = 20;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -21,8 +21,8 @@ var totalTime = 0;
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
 
 if ( WEBVR.isLatestAvailable() === false ) {
-	SHADOW_MAP_WIDTH = 1024;
-	SHADOW_MAP_HEIGHT = 1024;
+	SHADOW_MAP_WIDTH = 2048;
+	SHADOW_MAP_HEIGHT = 2048;
 	document.body.appendChild( WEBVR.getMessage() );
 
 }
@@ -219,7 +219,7 @@ function animate( timestamp ) {
 		cubesArr[ i ].lookAt( new THREE.Vector3( godPos.x,0,godPos.z ) );
 
 	}
-
+	// console.log(renderer.info.memory);
 }
 
 function pauseAll( bool ) {

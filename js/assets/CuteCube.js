@@ -16,6 +16,18 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
 
+	var clonedEyes = this.material.materials[ 1 ].map.clone();
+	//Hack for sprite issues https://github.com/mrdoob/three.js/issues/7956
+	clonedEyes.uuid = this.material.materials[ 1 ].map.uuid;
+	clonedEyes.needsUpdate = true;
+	this.material.materials[ 1 ].map = clonedEyes;
+
+	var clonedMouths = this.material.materials[ 2 ].map.clone();
+	//Hack for sprite issues https://github.com/mrdoob/three.js/issues/7956
+	clonedMouths.uuid = this.material.materials[ 2 ].map.uuid;
+	clonedMouths.needsUpdate = true;
+	this.material.materials[ 2 ].map = clonedMouths;
+
 	this.castShadow = true;
 	this.receiveShadow = false;
 	this.position.x = x;
@@ -114,7 +126,6 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 // Method to update location
 CuteCube.prototype.update = function ( timestamp ) {
-
 	// console.log(this.velocity);
 	// console.log(this.acceleration);
 	// Update velocity
