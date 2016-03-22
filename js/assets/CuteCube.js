@@ -1,20 +1,26 @@
-var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
+var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener ) {
 
 	'use strict';
-
 	//Seek and Separation parameters
 
-	this.secureDistanceToGod = 2;
+	this.secureDistanceToGod = 0.3;
 	this.maxSpeed = 0.005;
 	this.maxForce = 0.0048;
 	this.acceleration = new THREE.Vector2();
 	this.velocity = new THREE.Vector2();
-	this.separateFactor = 1;
-	this.seekFactor = 1;
+	this.separateFactor = 0.1;
+	this.seekFactor = 0.1;
 	this.desiredSeparation = 0.3;
 	this.godToFollow = godtoFollow;
 
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
+	this.name = 'cube' + index;
+
+	if ( this.name === 'cube1' ) {
+
+		this.material.materials[ 0 ].color = new THREE.Color( 0xcc0000 );
+
+	}
 
 	var clonedEyes = this.material.materials[ 1 ].map.clone();
 	//Hack for sprite issues https://github.com/mrdoob/three.js/issues/7956
@@ -35,7 +41,7 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 
 	this.prevPosition =  new THREE.Vector3();
 
-	this.moodManager = new MoodManager( this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
+	this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
 	this.add( this.moodManager );
 
 };
@@ -99,7 +105,15 @@ CuteCube.prototype.separate = function ( vehicles ) {
 		sum.sub( this.velocity );
 		sum.setLength( this.maxForce );
 
-		this.moodManager.mode = 'clash';
+		if ( count > 2 ) {
+
+			this.moodManager.clashing = true;
+
+		}else {
+
+			this.moodManager.clashing = false;
+
+		}
 
 	}
 	return sum;
@@ -118,10 +132,14 @@ CuteCube.prototype.seek = function ( godPosition ) {
 		// desired.setLength(m);
 		desired.setLength( - 0.01 );
 
+		this.moodManager.seeking = false;
+
 	}else {
 
 		// Normalize desired and scale to maximum speed
 		desired.setLength( this.maxSpeed );
+
+		this.moodManager.seeking = true;
 
 	}
 

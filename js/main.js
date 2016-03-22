@@ -158,8 +158,7 @@ function cuteCubeMeshReady() {
 		var xRnd = Math.cos( randomAngle ) * randomRadius;
 		var zRnd = Math.sin( randomAngle ) * randomRadius;
 
-		var cube = new CuteCube( xRnd, zRnd, cuteCubeMesh, camera, listener );
-		cube.name = 'cube' + i;
+		var cube = new CuteCube( i, totalCubes, xRnd, zRnd, cuteCubeMesh, camera, listener );
 		cubesArr.push( cube );
 		scene.add( cube );
 

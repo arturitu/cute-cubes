@@ -1,4 +1,4 @@
-var MoodManager = function ( eyesMap, mouthMap, listener ) {
+var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
 
 	'use strict';
 
@@ -18,80 +18,84 @@ var MoodManager = function ( eyesMap, mouthMap, listener ) {
 	this.soundLaugh = new THREE.PositionalAudio( listener );
 	this.soundLaugh.load( 'audio/hehehe.ogg' );
 	this.soundLaugh.setRefDistance( 0.5 );
-	this.soundLaugh.source.loop = false;
-	this.soundLaugh.autoplay = false;
 	this.add( this.soundLaugh );
 
-	this.soundClash = new THREE.PositionalAudio( listener );
-	this.soundClash.load( 'audio/guegue.ogg' );
-	this.soundClash.setRefDistance( 0.5 );
-	this.soundClash.source.loop = false;
-	this.soundClash.autoplay = false;
-	this.add( this.soundClash );
+	this.soundGueGue = new THREE.PositionalAudio( listener );
+	this.soundGueGue.load( 'audio/guegue.ogg' );
+	this.soundGueGue.setRefDistance( 0.5 );
+	this.soundGueGue.source.loop = false;
+	this.soundGueGue.autoplay = false;
+	this.add( this.soundGueGue );
 
-	//mode = expression + sound
-	//laugh / clash
-	this.mode = 'laugh';
+	this.soundClash_a = new THREE.PositionalAudio( listener );
+	this.soundClash_a.load( 'audio/clash_a.ogg' );
+	this.soundClash_a.setRefDistance( 0.5 );
+	this.soundClash_a.source.loop = false;
+	this.soundClash_a.autoplay = false;
+	this.add( this.soundClash_a );
+
+	this.soundClash_b = new THREE.PositionalAudio( listener );
+	this.soundClash_b.load( 'audio/clash_b.ogg' );
+	this.soundClash_b.setRefDistance( 0.5 );
+	this.soundClash_b.source.loop = false;
+	this.soundClash_b.autoplay = false;
+	this.add( this.soundClash_b );
+
+	this.soundOhh = new THREE.PositionalAudio( listener );
+	this.soundOhh.load( 'audio/ohh.ogg' );
+	this.soundOhh.setRefDistance( 0.5 );
+	this.soundOhh.source.loop = false;
+	this.soundOhh.autoplay = false;
+	this.add( this.soundOhh );
+
+	this.soundName = new THREE.PositionalAudio( listener );
+	this.soundName.load( 'audio/name.ogg' );
+	this.soundName.setRefDistance( 0.5 );
+	this.soundName.source.loop = false;
+	this.soundName.autoplay = false;
+	this.add( this.soundName );
+
+	this.clashing = false;
+	this.seeking = false;
+
+	this.arrExpressions = [];
 	this.isMoodActive = false;
 
-	this.timerIdle = Math.random() * 500 + 500;
-	this.timerBlink = Math.random() * 1000 + 3000;
+	this.timerMood = ( Math.random() * ( 1000 * totalCubes ) ) + 1000;
+	this.timerArrExpressions = 200;
+	this.timerIdle = ( Math.random() * 500 ) + 500;
+	this.timerBlink = ( Math.random() * 1000 ) + 3000;
 
+	this.moodFrame = 0;
+	this.arrExpressionsFrame = 0;
 	this.idleFrame = 0;
 	this.blinkFrame = 0;
 
-	this.expression;
+	this.arrExpressionsIndex = 0;
 
 }
 
 MoodManager.prototype = Object.create( THREE.Object3D.prototype );
 
-MoodManager.prototype.makeMood = function () {
-
-	// console.log( this.name, ': ', this.mood );
-	switch ( this.mood ) {
-		case 'laugh':
-			if ( this.soundLaugh.sourceType !== 'empty' && ! this.soundLaugh.isPlaying ) {
-
-				this.soundLaugh.play();
-				if ( this.soundClash.isPlaying ) {
-
-					this.soundClash.stop();
-
-				}
-
-			}
-			break;
-		case 'clash':
-			if ( this.soundClash.sourceType !== 'empty' && ! this.soundClash.isPlaying ) {
-
-				this.soundClash.play();
-				if ( this.soundLaugh.isPlaying ) {
-
-					this.soundLaugh.stop();
-
-				}
-
-			}
-			break;
-	}
-
-}
-
-MoodManager.prototype.laugh = function () {
-
-	if ( this.soundLaugh.sourceType !== 'empty' && ! this.soundLaugh.isPlaying ) {
-
-		this.soundLaugh.play();
-
-	}
-	setTimeout( this.laugh.bind( this ), ( Math.random() * 5000 ) + 1000 );
-
-}
-
 MoodManager.prototype.update = function ( timestamp ) {
 
 	// if(this.parent.name === 'cube1' ){
+
+	var moodFrameTmp = timestamp % this.timerMood / this.timerMood;
+	if ( this.moodFrame > moodFrameTmp ) {
+
+		this.doMood();
+
+	}
+	this.moodFrame = moodFrameTmp;
+
+	var arrExpressionsFrameTmp = timestamp % this.timerArrExpressions / this.timerArrExpressions;
+	if ( this.arrExpressionsFrame > arrExpressionsFrameTmp ) {
+
+		this.doArrExpressions();
+
+	}
+	this.arrExpressionsFrame = arrExpressionsFrameTmp;
 
 	var blinkFrameTmp = timestamp % this.timerBlink / this.timerBlink;
 	if ( this.blinkFrame > blinkFrameTmp ) {
@@ -110,37 +114,31 @@ MoodManager.prototype.update = function ( timestamp ) {
 	}
 	this.idleFrame = idleFrameTmp;
 
+}
 
-	// switch ( this.mood ) {
-	// 	case 'laugh':
-	// 		if ( this.soundLaugh.isPlaying ) {
-	//
-	// 			this.renderExpression( 'laugh' );
-	//
-	// 		}else {
-	//
-	// 			this.renderExpression( 'idle' );
-	//
-	// 		}
-	// 		break;
-	// 	case 'clash':
-	// 		if ( this.soundClash.isPlaying ) {
-	//
-	// 			this.renderExpression( 'clash' );
-	//
-	// 		}else {
-	//
-	// 			this.renderExpression( 'idle' );
-	//
-	// 		}
-	// 		break;
-	// }
+MoodManager.prototype.doArrExpressions = function () {
+
+	if ( this.arrExpressions.length > 0 ) {
+
+		if ( this.arrExpressionsIndex < this.arrExpressions.length ) {
+
+			this.renderExpression( this.arrExpressions[ this.arrExpressionsIndex ] );
+			this.arrExpressionsIndex ++;
+
+		}
+
+
+	}
 
 }
 
 MoodManager.prototype.doBlink = function () {
 
-	this.renderExpression( 'blink' );
+	if ( ! this.isMoodActive ) {
+
+		this.renderExpression( 'blink' );
+
+	}
 
 }
 
@@ -151,6 +149,141 @@ MoodManager.prototype.doIdle = function () {
 		this.renderExpression( 'idle' );
 
 	}
+
+}
+
+MoodManager.prototype.getMood = function () {
+
+	var possibleMoods = [];
+	possibleMoods.push( 'clash_b' );
+	// if ( this.clashing ) {
+	//
+	// 	possibleMoods.push( 'clash_a' );
+	// 	possibleMoods.push( 'clash_b' );
+	//
+	// }
+	// if ( this.seeking ) {
+	//
+	// 	possibleMoods.push( 'laugh' );
+	//
+	// }
+	// console.log( Math.floor( Math.random() * possibleMoods.length ) );
+	var randMood = Math.floor( Math.random() * possibleMoods.length );
+	return possibleMoods[ randMood ];
+
+}
+
+MoodManager.prototype.doMood = function () {
+
+	if ( this.isMoodActive ) {
+
+		return;
+
+	}
+
+	var name = this.getMood();
+	if ( this.parent.name === 'cube1' ) {
+
+		// console.log( name );
+
+	}
+
+	switch ( name ) {
+		case 'laugh':
+			this.isMoodActive = true;
+			this.soundLaugh.play();
+			this.arrExpressions = [ 'laugh1','laugh2','laugh1','laugh2' ];
+			var scope = this;
+			this.soundLaugh.source.onended = function() {
+
+				scope.soundLaugh.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+		case 'guegue':
+			this.isMoodActive = true;
+			this.soundGueGue.play();
+			this.arrExpressions = [ 'guegue1','guegue2','guegue1','guegue2' ];
+			var scope = this;
+			this.soundGueGue.source.onended = function() {
+
+				scope.soundGueGue.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+		case 'clash_a':
+			this.isMoodActive = true;
+			this.soundClash_a.play();
+			this.arrExpressions = [ 'clash_a' ];
+			var scope = this;
+			this.soundClash_a.source.onended = function() {
+
+				scope.soundClash_a.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+		case 'clash_b':
+			this.isMoodActive = true;
+			this.soundClash_b.play();
+			this.arrExpressions = [ 'clash_b' ];
+			var scope = this;
+			this.soundClash_b.source.onended = function() {
+
+				scope.soundClash_b.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+		case 'ohh':
+			this.isMoodActive = true;
+			this.soundOhh.play();
+			this.arrExpressions = [ 'ohh','ohh','ohh','ohh' ];
+			var scope = this;
+			this.soundOhh.source.onended = function() {
+
+				scope.soundOhh.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+		case 'name':
+			this.isMoodActive = true;
+			this.soundName.play();
+			this.arrExpressions = this.getPhonemes( 'Whats your name' );
+			var scope = this;
+			this.soundName.source.onended = function() {
+
+				scope.soundName.isPlaying = false;
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			};
+			break;
+	}
+
+}
+
+MoodManager.prototype.getPhonemes = function ( string ) {
+
+	var phonemesArr = [];
+	for ( var i = 0; i < string.length; i ++ ) {
+
+	}
+	return phonemesArr;
 
 }
 
@@ -186,14 +319,11 @@ MoodManager.prototype.changeMouth = function ( index ) {
 
 MoodManager.prototype.renderExpression = function ( expression ) {
 
-	// console.log(expression);
-	if ( this.expression === expression ) {
+	if ( this.parent.name === 'cube1' ) {
 
-		return;
+		// console.log( expression );
 
 	}
-	this.expression = expression;
-	// console.log( this.name, expression );
 	switch ( expression ) {
 		case 'idle':
 			this.changeEyes( 1 );
@@ -225,6 +355,10 @@ MoodManager.prototype.renderExpression = function ( expression ) {
 		case 'laugh2':
 			this.changeEyes( 7 );
 			this.changeMouth( 14 );
+			break;
+		case 'ohh':
+			this.changeEyes( 1 );
+			this.changeMouth( 11 );
 			break;
 		case 'phoneme_-':
 			this.changeMouth( 9 );
