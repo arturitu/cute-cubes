@@ -20,10 +20,16 @@ var totalTime = 0;
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
+var moveForward = false;
+var moveBackwards = false;
+var moveLeft = false;
+var moveRight = false;
+var radiusLimit = 2;
 
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
 
 if ( WEBVR.isLatestAvailable() === false ) {
+
 	SHADOW_MAP_WIDTH = 2048;
 	SHADOW_MAP_HEIGHT = 2048;
 	document.body.appendChild( WEBVR.getMessage() );
@@ -109,7 +115,7 @@ function init() {
 	pointL1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
 	pointL1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 	pointL1.shadow.bias = 0.001;
-	pointL1.position.set( -3, 5, -3 );
+	pointL1.position.set( - 3, 5, - 3 );
 	scene.add( pointL1 );
 
 	//Ground
@@ -164,10 +170,37 @@ function randomRange ( min, max ) {
 
 function vrFallback() {
 
+	document.addEventListener( 'keydown', onDocumentKeyDown, false );
+	document.addEventListener( 'keyup', onDocumentKeyUp, false );
 	// controls = new THREE.OrbitControls( camera );
 	mouse.x = 0;
 	mouse.y = 0;
 	controls = new THREE.TouchControls( camera, mouse, 0 );
+
+}
+
+function onDocumentKeyDown( event ) {
+
+	switch ( event.keyCode ) {
+
+		case 38: moveForward = true; break; // up
+		case 40: moveBackwards = true; break; // down
+		case 37: moveLeft = true; break; // left
+		case 39: moveRight = true; break; // right
+	}
+
+}
+
+function onDocumentKeyUp( event ) {
+
+	switch ( event.keyCode ) {
+
+		case 38: moveForward = false; break; // up
+		case 40: moveBackwards = false; break; // down
+		case 37: moveLeft = false; break; // left
+		case 39: moveRight = false; break; // right
+
+	}
 
 }
 
@@ -196,6 +229,52 @@ function animate( timestamp ) {
 
 	}
 
+	requestAnimationFrame( animate );
+	render( timestamp );
+
+}
+
+
+function render( timestamp ) {
+
+	if ( camera.position.z > - radiusLimit && camera.position.z < radiusLimit ) {
+
+		if ( moveForward ) camera.position.z -= 0.1;
+		if ( moveBackwards ) camera.position.z += 0.1;
+
+		if ( camera.position.z < - radiusLimit ) {
+
+			camera.position.z = - radiusLimit + 0.05;
+
+		}
+
+		if ( camera.position.z > radiusLimit ) {
+
+			camera.position.z = radiusLimit - 0.05;
+
+		}
+
+	}
+
+	if ( camera.position.x > - radiusLimit && camera.position.x < radiusLimit ) {
+
+		if ( moveLeft ) camera.position.x -= 0.1;
+		if ( moveRight ) camera.position.x += 0.1;
+
+		if ( camera.position.x < - radiusLimit ) {
+
+			camera.position.x = - radiusLimit + 0.05;
+
+		}
+
+		if ( camera.position.x > radiusLimit ) {
+
+			camera.position.x = radiusLimit - 0.05;
+
+		}
+
+	}
+
 	if ( vrMode ) {
 
 		effect.render( scene, camera );
@@ -208,16 +287,19 @@ function animate( timestamp ) {
 	// Update VR headset position and apply to camera.
 	controls.update();
 
-	requestAnimationFrame( animate );
-	totalTime = Math.round(timestamp/1000);
+	totalTime = Math.round( timestamp / 1000 );
 	// console.log(totalTime);
 	for ( var i = 0; i < cubesArr.length; i ++ ) {
 
-		if(totalTime > 60 && totalTime<120){
-			cubesArr[ i ].setSecureDistance(1);
+		if ( totalTime > 60 && totalTime < 120 ) {
+
+			cubesArr[ i ].setSecureDistance( 1 );
+
 		}
-		if ( totalTime>120 ){
-			cubesArr[ i ].setSecureDistance(0.3);
+		if ( totalTime > 120 ) {
+
+			cubesArr[ i ].setSecureDistance( 0.3 );
+
 		}
 		cubesArr[ i ].applyBehaviors( cubesArr );
 		cubesArr[ i ].update( timestamp );
@@ -226,6 +308,7 @@ function animate( timestamp ) {
 
 	}
 	// console.log(renderer.info.memory);
+
 }
 
 function pauseAll( bool ) {

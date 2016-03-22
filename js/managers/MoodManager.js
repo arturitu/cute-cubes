@@ -34,8 +34,8 @@ var MoodManager = function ( eyesMap, mouthMap, listener ) {
 	this.mode = 'laugh';
 	this.isMoodActive = false;
 
-	this.timerIdle = Math.random()*500 + 500;
-	this.timerBlink = Math.random()*1000 + 3000;
+	this.timerIdle = Math.random() * 500 + 500;
+	this.timerBlink = Math.random() * 1000 + 3000;
 
 	this.idleFrame = 0;
 	this.blinkFrame = 0;
@@ -93,16 +93,20 @@ MoodManager.prototype.update = function ( timestamp ) {
 
 	// if(this.parent.name === 'cube1' ){
 
-	var blinkFrameTmp = timestamp%this.timerBlink / this.timerBlink;
-	if ( this.blinkFrame > blinkFrameTmp ){
+	var blinkFrameTmp = timestamp % this.timerBlink / this.timerBlink;
+	if ( this.blinkFrame > blinkFrameTmp ) {
+
 		this.doBlink();
+
 	}
 	this.blinkFrame = blinkFrameTmp;
 
 
-	var idleFrameTmp = timestamp%this.timerIdle / this.timerIdle;
-	if ( this.idleFrame > idleFrameTmp ){
+	var idleFrameTmp = timestamp % this.timerIdle / this.timerIdle;
+	if ( this.idleFrame > idleFrameTmp ) {
+
 		this.doIdle();
+
 	}
 	this.idleFrame = idleFrameTmp;
 
@@ -136,15 +140,15 @@ MoodManager.prototype.update = function ( timestamp ) {
 
 MoodManager.prototype.doBlink = function () {
 
-	this.renderExpression('blink');
+	this.renderExpression( 'blink' );
 
 }
 
 MoodManager.prototype.doIdle = function () {
 
-	if( !this.isMoodActive ){
+	if ( ! this.isMoodActive ) {
 
-		this.renderExpression('idle');
+		this.renderExpression( 'idle' );
 
 	}
 
@@ -153,7 +157,7 @@ MoodManager.prototype.doIdle = function () {
 //To control pause
 MoodManager.prototype.pauseAll = function ( bool ) {
 
-	if ( bool ){
+	if ( bool ) {
 
 	}else {
 
@@ -181,6 +185,7 @@ MoodManager.prototype.changeMouth = function ( index ) {
 }
 
 MoodManager.prototype.renderExpression = function ( expression ) {
+
 	// console.log(expression);
 	if ( this.expression === expression ) {
 
@@ -191,8 +196,8 @@ MoodManager.prototype.renderExpression = function ( expression ) {
 	// console.log( this.name, expression );
 	switch ( expression ) {
 		case 'idle':
-				this.changeEyes( 1 );
-				this.changeMouth( 2 );
+			this.changeEyes( 1 );
+			this.changeMouth( 2 );
 			break;
 		case 'blink':
 			this.changeEyes( 5 );

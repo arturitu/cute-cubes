@@ -37,6 +37,7 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 
 	this.moodManager = new MoodManager( this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
 	this.add( this.moodManager );
+
 };
 
 CuteCube.prototype = Object.create( THREE.Mesh.prototype );
@@ -107,14 +108,17 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 	var desired = new THREE.Vector3();
 	desired = desired.subVectors( godPosition, this.position );  // A vector pointing from the location to the target
-	console.log(this.secureDistanceToGod);
-	if( desired.length() < this.secureDistanceToGod ){
+	if ( desired.length() < this.secureDistanceToGod ) {
+
 		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
-    // desired.setLength(m);
-		desired.setLength(0);
-	}else{
-			// Normalize desired and scale to maximum speed
+		// desired.setLength(m);
+		desired.setLength( 0 );
+
+	}else {
+
+		// Normalize desired and scale to maximum speed
 		desired.setLength( this.maxSpeed );
+
 	}
 
 	// Steering = Desired minus velocity
@@ -127,6 +131,7 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 // Method to update location
 CuteCube.prototype.update = function ( timestamp ) {
+
 	// console.log(this.velocity);
 	// console.log(this.acceleration);
 	// Update velocity
@@ -139,7 +144,7 @@ CuteCube.prototype.update = function ( timestamp ) {
 	// console.log( Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z ) );
 	// var diff = Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z );
 	// if(diff > 0.003){
-		this.position.add( this.velocity );
+	this.position.add( this.velocity );
 	// }
 	// Reset acceleration to 0 each cycle
 	this.acceleration.multiplyScalar( 0 );
@@ -151,11 +156,17 @@ CuteCube.prototype.update = function ( timestamp ) {
 //END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 
 CuteCube.prototype.pauseAll = function ( bool ) {
+
 	this.moodManager.pauseAll( bool );
+
 }
 
 CuteCube.prototype.setSecureDistance = function ( i ) {
-	if( this.secureDistanceToGod !== i){
+
+	if ( this.secureDistanceToGod !== i ) {
+
 		this.secureDistanceToGod = i;
+
 	}
+
 }

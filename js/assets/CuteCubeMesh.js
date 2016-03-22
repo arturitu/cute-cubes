@@ -11,10 +11,14 @@ var CuteCubeMesh = function () {
 		// console.log(mat.materials[1]);
 		THREE.Mesh.call( scope, geometry, mat );
 
-		var eyesTexture = new THREE.TextureLoader().load( 'assets/eyes.jpg', function(){
-			var mouthsTexture = new THREE.TextureLoader().load( 'assets/mouths.jpg', function(){
-						scope.dispatchEvent( { type: 'ready' } );
-			});
+		var eyesTexture = new THREE.TextureLoader().load( 'assets/eyes.jpg', function() {
+
+			var mouthsTexture = new THREE.TextureLoader().load( 'assets/mouths.jpg', function() {
+
+				scope.dispatchEvent( { type: 'ready' } );
+
+			} );
+
 		} );
 
 	} );
