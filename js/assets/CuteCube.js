@@ -7,10 +7,10 @@ var CuteCube = function ( x, z, mesh, godtoFollow, listener ) {
 	this.secureDistanceToGod = 2;
 	this.maxSpeed = 0.005;
 	this.maxForce = 0.0048;
-	this.acceleration = new THREE.Vector3();
-	this.velocity = new THREE.Vector3();
-	this.separateFactor = 0.1;
-	this.seekFactor = 0.1;
+	this.acceleration = new THREE.Vector2();
+	this.velocity = new THREE.Vector2();
+	this.separateFactor = 1;
+	this.seekFactor = 1;
 	this.desiredSeparation = 0.3;
 	this.godToFollow = godtoFollow;
 
@@ -47,7 +47,9 @@ CuteCube.prototype.applyBehaviors = function ( vehicles ) {
 
 	// console.log(arr);
 	var separateForce = this.separate( vehicles );
-	var seekForce = this.seek( this.godToFollow.position );
+
+	var godPosition = new THREE.Vector2( this.godToFollow.position.x, this.godToFollow.position.z );
+	var seekForce = this.seek( godPosition );
 
 	separateForce * this.separateFactor;
 	seekForce * this.seekFactor;
@@ -64,20 +66,20 @@ CuteCube.prototype.applyForce = function ( force ) {
 }
 CuteCube.prototype.separate = function ( vehicles ) {
 
-	var sum = new THREE.Vector3();
+	var sum = new THREE.Vector2();
 	var count = 0;
 	// For every boid in the system, check if it's too close
 	for ( var i = 0; i < vehicles.length; i ++ ) {
 
-		// var d = new THREE.Vector3();
-		var d = this.position.distanceTo( vehicles[ i ].position );
-
+		var myPos2D = new THREE.Vector2( this.position.x, this.position.z );
+		var vehiclePos2D = new THREE.Vector2( vehicles[ i ].position.x,vehicles[ i ].position.z );
+		var d = myPos2D.distanceTo( vehiclePos2D );
 		// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
 		if ( ( d > 0 ) && ( d < this.desiredSeparation ) ) {
 
 			// Calculate vector pointing away from neighbor
-			var diff = new THREE.Vector3();
-			diff = diff.subVectors( this.position, vehicles[ i ].position );
+			var diff = new THREE.Vector2();
+			diff = diff.subVectors( myPos2D, vehiclePos2D );
 			diff.normalize();
 			diff.divideScalar( d );        // Weight by distance
 			sum.add( diff );
@@ -106,13 +108,15 @@ CuteCube.prototype.separate = function ( vehicles ) {
 
 CuteCube.prototype.seek = function ( godPosition ) {
 
-	var desired = new THREE.Vector3();
-	desired = desired.subVectors( godPosition, this.position );  // A vector pointing from the location to the target
+	var desired = new THREE.Vector2();
+	var myPos2D = new THREE.Vector2( this.position.x,this.position.z );
+	desired = desired.subVectors( godPosition, myPos2D );  // A vector pointing from the location to the target
+	// console.log( desired.length() );
 	if ( desired.length() < this.secureDistanceToGod ) {
 
 		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
 		// desired.setLength(m);
-		desired.setLength( 0 );
+		desired.setLength( - 0.01 );
 
 	}else {
 
@@ -122,7 +126,7 @@ CuteCube.prototype.seek = function ( godPosition ) {
 	}
 
 	// Steering = Desired minus velocity
-	var steer = new THREE.Vector3();
+	var steer = new THREE.Vector2();
 	steer = steer.subVectors( desired, this.velocity );
 	steer.setLength( this.maxForce );  // Limit to maximum steering force
 	return steer;
@@ -132,23 +136,16 @@ CuteCube.prototype.seek = function ( godPosition ) {
 // Method to update location
 CuteCube.prototype.update = function ( timestamp ) {
 
-	// console.log(this.velocity);
-	// console.log(this.acceleration);
 	// Update velocity
 	this.velocity.add( this.acceleration );
 	// Limit speed
 	this.velocity.setLength( this.maxSpeed );
-	// this.prevPosition = this.position.clone();
-	// this.prevPosition.add( this.velocity );
-	//
-	// console.log( Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z ) );
-	// var diff = Math.abs ( this.prevPosition.x - this.position.x ) + Math.abs ( this.prevPosition.z - this.position.z );
-	// if(diff > 0.003){
-	this.position.add( this.velocity );
-	// }
+	var vel3D = new THREE.Vector3 ( this.velocity.x,0,this.velocity.y );
+	this.position.add( vel3D );
+
 	// Reset acceleration to 0 each cycle
 	this.acceleration.multiplyScalar( 0 );
-	this.position.y = 0;
+	// this.position.y = 0;
 	// console.log(this.position);
 	this.moodManager.update( timestamp );
 

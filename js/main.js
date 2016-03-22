@@ -120,12 +120,17 @@ function init() {
 
 	//Ground
 
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
+	var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 50, 50 );
 	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshPhongMaterial( { color: 0xffffff, shininess: 10,
-					specular: 0x111111 } ) );
+	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } ) );
 	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
+
+	var circleGeometry = new THREE.CircleGeometry( 2, 32 );
+	circleGeometry.rotateX( - Math.PI / 2 );
+	var secure = new THREE.Mesh( circleGeometry, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
+	secure.receiveShadow = true;
+	scene.add( secure );
 
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
@@ -239,18 +244,28 @@ function render( timestamp ) {
 
 	if ( camera.position.z > - radiusLimit && camera.position.z < radiusLimit ) {
 
-		if ( moveForward ) camera.position.z -= 0.1;
-		if ( moveBackwards ) camera.position.z += 0.1;
+		if ( moveForward ) {
+
+			camera.position.z -= 0.05 * Math.cos( camera.rotation.y );
+			camera.position.x -= 0.05 * Math.sin( camera.rotation.y );
+
+		}
+		if ( moveBackwards ) {
+
+			camera.position.z += 0.05 * Math.cos( camera.rotation.y );
+			camera.position.x += 0.05 * Math.sin( camera.rotation.y );
+
+		}
 
 		if ( camera.position.z < - radiusLimit ) {
 
-			camera.position.z = - radiusLimit + 0.05;
+			camera.position.z = - radiusLimit + 0.02;
 
 		}
 
 		if ( camera.position.z > radiusLimit ) {
 
-			camera.position.z = radiusLimit - 0.05;
+			camera.position.z = radiusLimit - 0.02;
 
 		}
 
@@ -258,18 +273,28 @@ function render( timestamp ) {
 
 	if ( camera.position.x > - radiusLimit && camera.position.x < radiusLimit ) {
 
-		if ( moveLeft ) camera.position.x -= 0.1;
-		if ( moveRight ) camera.position.x += 0.1;
+		if ( moveLeft ) {
+
+			camera.position.x -= 0.05 * Math.cos( camera.rotation.y );
+			camera.position.z += 0.05 * Math.sin( camera.rotation.y );
+
+		}
+		if ( moveRight ) {
+
+			camera.position.x += 0.05 * Math.cos( camera.rotation.y );
+			camera.position.z -= 0.05 * Math.sin( camera.rotation.y );
+
+		}
 
 		if ( camera.position.x < - radiusLimit ) {
 
-			camera.position.x = - radiusLimit + 0.05;
+			camera.position.x = - radiusLimit + 0.02;
 
 		}
 
 		if ( camera.position.x > radiusLimit ) {
 
-			camera.position.x = radiusLimit - 0.05;
+			camera.position.x = radiusLimit - 0.02;
 
 		}
 
