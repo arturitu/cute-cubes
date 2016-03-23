@@ -1,8 +1,6 @@
 // http://blog.teamtreehouse.com/getting-started-speech-synthesis-api
 var SpeechManager = function () {
 
-	THREE.Object3D.call( this );
-
 	this.msg = new SpeechSynthesisUtterance();
 	this.msg.lang = 'en-US';
 	// this.msg.lang = 'es-ES';
@@ -37,8 +35,6 @@ var SpeechManager = function () {
 	}
 
 }
-
-SpeechManager.prototype = Object.create( THREE.Object3D.prototype );
 
 SpeechManager.prototype.speak = function ( text ) {
 

@@ -82,7 +82,6 @@ MoodManager.prototype.init = function ( ) {
 	if ( this.parent.name === 'cube0' ) {
 
 		this.mySpeech = new SpeechManager();
-		this.add( this.mySpeech );
 
 	}
 
@@ -177,7 +176,7 @@ MoodManager.prototype.getMood = function () {
 	// 	possibleMoods.push( 'laugh' );
 	//
 	// }
-	possibleMoods.push( 'none' );
+	// possibleMoods.push( 'none' );
 	// console.log( Math.floor( Math.random() * possibleMoods.length ) );
 	var randMood = Math.floor( Math.random() * possibleMoods.length );
 	return possibleMoods[ randMood ];
