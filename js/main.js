@@ -252,6 +252,7 @@ function animate( timestamp ) {
 
 function render( timestamp ) {
 
+	// TODO FIX position when looks down (change z, x position)
 	if ( camera.position.z > - radiusLimit && camera.position.z < radiusLimit ) {
 
 		if ( moveForward ) {
