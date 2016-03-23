@@ -12,8 +12,8 @@ var ground, positionalGround;
 var light, pointL1, pointL2, pointL3;
 var lightsArr = [];
 var isPaused = false;
-var initMinRadius = 2.1;
-var initMaxRadius = 3;
+var initMinRadius = 0.1;
+var initMaxRadius = 0.5;
 var originPos;
 var worldPosition = new THREE.Vector3();
 var totalTime = 0;
@@ -27,6 +27,16 @@ var moveRight = false;
 var radiusLimit = 2;
 
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
+
+// if ( 'speechSynthesis' in window ) {
+//
+// 	console.log( 'yea' );
+//
+// } else {
+//
+// 	console.log( 'non' );
+//
+// }
 
 if ( WEBVR.isLatestAvailable() === false ) {
 
@@ -176,6 +186,7 @@ function vrFallback() {
 
 	document.addEventListener( 'keydown', onDocumentKeyDown, false );
 	document.addEventListener( 'keyup', onDocumentKeyUp, false );
+	// camera.position.set( 0, 2, 0 );
 	// controls = new THREE.OrbitControls( camera );
 	mouse.x = 0;
 	mouse.y = 0;

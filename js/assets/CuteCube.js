@@ -3,7 +3,7 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	'use strict';
 	//Seek and Separation parameters
 
-	this.secureDistanceToGod = 0.3;
+	this.secureDistanceToGod = 1;
 	this.maxSpeed = 0.005;
 	this.maxForce = 0.0048;
 	this.acceleration = new THREE.Vector2();
@@ -16,9 +16,10 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
 	this.name = 'cube' + index;
 
-	if ( this.name === 'cube1' ) {
+	if ( this.name === 'cube0' ) {
 
-		this.material.materials[ 0 ].color = new THREE.Color( 0xcc0000 );
+		this.scale.set( 2, 2, 2 );
+		// this.material.materials[ 0 ].color = new THREE.Color( 0xcc0000 );
 
 	}
 
@@ -43,6 +44,7 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 
 	this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
 	this.add( this.moodManager );
+	this.moodManager.init();
 
 };
 

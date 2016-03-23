@@ -62,7 +62,7 @@ var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
 	this.isMoodActive = false;
 
 	this.timerMood = ( Math.random() * ( 1000 * totalCubes ) ) + 1000;
-	this.timerArrExpressions = 200;
+	this.timerArrExpressions = setInterval( this.doArrExpressions.bind( this ), 80 );
 	this.timerIdle = ( Math.random() * 500 ) + 500;
 	this.timerBlink = ( Math.random() * 1000 ) + 3000;
 
@@ -77,9 +77,18 @@ var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
 
 MoodManager.prototype = Object.create( THREE.Object3D.prototype );
 
-MoodManager.prototype.update = function ( timestamp ) {
+MoodManager.prototype.init = function ( ) {
 
-	// if(this.parent.name === 'cube1' ){
+	if ( this.parent.name === 'cube0' ) {
+
+		this.mySpeech = new SpeechManager();
+		this.add( this.mySpeech );
+
+	}
+
+}
+
+MoodManager.prototype.update = function ( timestamp ) {
 
 	var moodFrameTmp = timestamp % this.timerMood / this.timerMood;
 	if ( this.moodFrame > moodFrameTmp ) {
@@ -88,14 +97,6 @@ MoodManager.prototype.update = function ( timestamp ) {
 
 	}
 	this.moodFrame = moodFrameTmp;
-
-	var arrExpressionsFrameTmp = timestamp % this.timerArrExpressions / this.timerArrExpressions;
-	if ( this.arrExpressionsFrame > arrExpressionsFrameTmp ) {
-
-		this.doArrExpressions();
-
-	}
-	this.arrExpressionsFrame = arrExpressionsFrameTmp;
 
 	var blinkFrameTmp = timestamp % this.timerBlink / this.timerBlink;
 	if ( this.blinkFrame > blinkFrameTmp ) {
@@ -155,7 +156,16 @@ MoodManager.prototype.doIdle = function () {
 MoodManager.prototype.getMood = function () {
 
 	var possibleMoods = [];
-	possibleMoods.push( 'clash_b' );
+	if ( this.parent.name === 'cube0' ) {
+
+		possibleMoods.push( 'speech' );
+
+	}else {
+
+		possibleMoods.push( 'laugh' );
+
+	}
+
 	// if ( this.clashing ) {
 	//
 	// 	possibleMoods.push( 'clash_a' );
@@ -167,6 +177,7 @@ MoodManager.prototype.getMood = function () {
 	// 	possibleMoods.push( 'laugh' );
 	//
 	// }
+	possibleMoods.push( 'none' );
 	// console.log( Math.floor( Math.random() * possibleMoods.length ) );
 	var randMood = Math.floor( Math.random() * possibleMoods.length );
 	return possibleMoods[ randMood ];
@@ -180,14 +191,7 @@ MoodManager.prototype.doMood = function () {
 		return;
 
 	}
-
 	var name = this.getMood();
-	if ( this.parent.name === 'cube1' ) {
-
-		// console.log( name );
-
-	}
-
 	switch ( name ) {
 		case 'laugh':
 			this.isMoodActive = true;
@@ -273,6 +277,25 @@ MoodManager.prototype.doMood = function () {
 
 			};
 			break;
+		case 'speech':
+			var speechListened = 'Whats your name?';
+			this.mySpeech.speak( speechListened );
+
+			var scope = this;
+			this.mySpeech.msg.onstart = function () {
+
+				scope.isMoodActive = true;
+				scope.arrExpressions = scope.getPhonemes( speechListened );
+
+			}
+			this.mySpeech.msg.onend = function () {
+
+				scope.isMoodActive = false;
+				scope.arrExpressions = [];
+				scope.arrExpressionsIndex = 0;
+
+			}
+			break;
 	}
 
 }
@@ -282,7 +305,54 @@ MoodManager.prototype.getPhonemes = function ( string ) {
 	var phonemesArr = [];
 	for ( var i = 0; i < string.length; i ++ ) {
 
+		var letter = string.substr( i, 1 ).toLowerCase();
+		switch ( letter ) {
+			case 'a':
+			case 'i':
+			case 'y':
+				phonemesArr.push( 'phoneme_a' );
+				break;
+			case 'o':
+			case 'u':
+			case 'w':
+			case 'r':
+				phonemesArr.push( 'phoneme_o' );
+				break;
+			case 'e':
+			case 'x':
+				phonemesArr.push( 'phoneme_e' );
+				break;
+			case 's':
+			case 'c':
+			case 'd':
+			case 'g':
+			case 'k':
+			case 'n':
+			case 'r':
+			case 't':
+			case 'z':
+			case 'j':
+			case 'q':
+				phonemesArr.push( 'phoneme_s' );
+				break;
+			case 'l':
+				phonemesArr.push( 'phoneme_l' );
+				break;
+			case 'm':
+			case 'b':
+			case 'p':
+				phonemesArr.push( 'phoneme_m' );
+				break;
+			case 'f':
+			case 'v':
+				phonemesArr.push( 'phoneme_f' );
+				break;
+			default:
+				phonemesArr.push( 'phoneme_-' );
+		}
+
 	}
+	// console.log( phonemesArr );
 	return phonemesArr;
 
 }
@@ -319,11 +389,6 @@ MoodManager.prototype.changeMouth = function ( index ) {
 
 MoodManager.prototype.renderExpression = function ( expression ) {
 
-	if ( this.parent.name === 'cube1' ) {
-
-		// console.log( expression );
-
-	}
 	switch ( expression ) {
 		case 'idle':
 			this.changeEyes( 1 );
