@@ -28,7 +28,7 @@ var radiusLimit = 2;
 
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
 
-// if ( 'speechSynthesis' in window ) {
+// if ( ('speechSynthesis' in window) && ('webkitSpeechRecognition' in window) ) {
 //
 // 	console.log( 'yea' );
 //

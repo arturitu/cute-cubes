@@ -1,6 +1,8 @@
 // http://blog.teamtreehouse.com/getting-started-speech-synthesis-api
 var SpeechManager = function () {
 
+	'use strict';
+
 	this.msg = new SpeechSynthesisUtterance();
 	this.msg.lang = 'en-US';
 	// this.msg.lang = 'es-ES';
@@ -22,17 +24,13 @@ var SpeechManager = function () {
 
 	};
 
-	this.msg.onstart = function ( e ) {
-
-		console.log( 'start' );
-
-	}
-
-	this.msg.onend = function ( e ) {
-
-		console.log( 'end' );
-
-	}
+	// this.msg.onstart = function ( e ) {
+	//
+	// }
+	//
+	// this.msg.onend = function ( e ) {
+	//
+	// }
 
 }
 

@@ -73,6 +73,8 @@ var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
 
 	this.arrExpressionsIndex = 0;
 
+	this.speechRecognized = 'Whats your name?';
+
 }
 
 MoodManager.prototype = Object.create( THREE.Object3D.prototype );
@@ -82,8 +84,18 @@ MoodManager.prototype.init = function ( ) {
 	if ( this.parent.name === 'cube0' ) {
 
 		this.mySpeech = new SpeechManager();
+		this.myRecognizer = new RecognitionManager();
+		this.myRecognizer.start();
+		this.myRecognizer.addEventListener( 'recognized', this.textRecognized.bind( this ) );
 
 	}
+
+}
+
+MoodManager.prototype.textRecognized = function ( ) {
+
+	this.speechRecognized = this.myRecognizer.final_transcript;
+	this.doMood( 'speech' );
 
 }
 
@@ -183,14 +195,24 @@ MoodManager.prototype.getMood = function () {
 
 }
 
-MoodManager.prototype.doMood = function () {
+MoodManager.prototype.doMood = function ( mustMood ) {
 
+	// console.log( mustMood );
 	if ( this.isMoodActive ) {
 
 		return;
 
 	}
-	var name = this.getMood();
+	var name = '';
+	if ( mustMood !== undefined ) {
+
+		name = mustMood;
+
+	}else {
+
+		name = this.getMood();
+
+	}
 	switch ( name ) {
 		case 'laugh':
 			this.isMoodActive = true;
@@ -277,14 +299,13 @@ MoodManager.prototype.doMood = function () {
 			};
 			break;
 		case 'speech':
-			var speechListened = 'Whats your name?';
-			this.mySpeech.speak( speechListened );
+			this.mySpeech.speak( this.speechRecognized );
 
 			var scope = this;
-			this.mySpeech.msg.onstart = function () {
+			this.mySpeech.msg.onstart = function ( e ) {
 
 				scope.isMoodActive = true;
-				scope.arrExpressions = scope.getPhonemes( speechListened );
+				scope.arrExpressions = scope.getPhonemes( scope.speechRecognized );
 
 			}
 			this.mySpeech.msg.onend = function () {
@@ -299,12 +320,12 @@ MoodManager.prototype.doMood = function () {
 
 }
 
-MoodManager.prototype.getPhonemes = function ( string ) {
+MoodManager.prototype.getPhonemes = function ( s ) {
 
 	var phonemesArr = [];
-	for ( var i = 0; i < string.length; i ++ ) {
+	for ( var i = 0; i < s.length; i ++ ) {
 
-		var letter = string.substr( i, 1 ).toLowerCase();
+		var letter = s.substr( i, 1 ).toLowerCase();
 		switch ( letter ) {
 			case 'a':
 			case 'i':
