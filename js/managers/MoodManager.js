@@ -216,6 +216,11 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 	switch ( name ) {
 		case 'laugh':
 			this.isMoodActive = true;
+			if ( ! this.soundLaugh.source.buffer ) {
+
+				return;
+
+			}
 			this.soundLaugh.play();
 			this.arrExpressions = [ 'laugh1','laugh2','laugh1','laugh2' ];
 			var scope = this;
@@ -230,6 +235,11 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 			break;
 		case 'guegue':
 			this.isMoodActive = true;
+			if ( ! this.soundGueGue.source.buffer ) {
+
+				return;
+
+			}
 			this.soundGueGue.play();
 			this.arrExpressions = [ 'guegue1','guegue2','guegue1','guegue2' ];
 			var scope = this;
@@ -244,6 +254,11 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 			break;
 		case 'clash_a':
 			this.isMoodActive = true;
+			if ( ! this.soundClash_a.source.buffer ) {
+
+				return;
+
+			}
 			this.soundClash_a.play();
 			this.arrExpressions = [ 'clash_a' ];
 			var scope = this;
@@ -258,6 +273,11 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 			break;
 		case 'clash_b':
 			this.isMoodActive = true;
+			if ( ! this.soundClash_b.source.buffer ) {
+
+				return;
+
+			}
 			this.soundClash_b.play();
 			this.arrExpressions = [ 'clash_b' ];
 			var scope = this;
@@ -272,6 +292,11 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 			break;
 		case 'ohh':
 			this.isMoodActive = true;
+			if ( ! this.soundOhh.source.buffer ) {
+
+				return;
+
+			}
 			this.soundOhh.play();
 			this.arrExpressions = [ 'ohh','ohh','ohh','ohh' ];
 			var scope = this;
@@ -286,6 +311,7 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 			break;
 		case 'name':
 			this.isMoodActive = true;
+			console.log( this.soundName.context );
 			this.soundName.play();
 			this.arrExpressions = this.getPhonemes( 'Whats your name' );
 			var scope = this;

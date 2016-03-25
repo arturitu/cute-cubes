@@ -24,6 +24,7 @@ var SpeechManager = function () {
 
 	};
 
+	//TODO get the time of the speech to adjust mouth http://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working
 	// this.msg.onstart = function ( e ) {
 	//
 	// }

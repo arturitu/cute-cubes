@@ -36,21 +36,29 @@ var RecognitionManager = function () {
 
 		}
 		// console.log( interim_transcript );
-		// console.log( scope.final_transcript );
+		console.log( scope.final_transcript );
 
 	}
 
-	this.recognition.onaudiostart = function( event ) {
+	this.recognition.onstart = function( event ) {
 
 		console.log( 'audio start' );
 
 	}
 
-	this.recognition.onaudioend = function( event ) {
+	this.recognition.onend = function( event ) {
 
 		console.log( 'audio end' );
+		// this.stop();
+		scope.start();
 
 	}
+
+	// this.recognition.onend = function( event ) {
+	//
+	// 	console.log( 'endddd' );
+	//
+	// }
 
 	this.recognition.onerror = function( error ) {
 
