@@ -2,6 +2,7 @@
 
 var clock, container, camera, scene, renderer, controls, effect, listener, loader;
 var vrMode = false;
+var vrDisplay = null;
 var	toogle = 0;
 var userHeight = 1.3;
 var totalCubes = 20;
@@ -96,6 +97,34 @@ function init() {
 		controls = new THREE.VRControls( camera, vrFallback );
 		vrMode = true;
 
+		navigator.getVRDisplays().then( function ( displays ) {
+
+			if ( displays.length > 0 ) {
+
+				vrDisplay = displays[ 0 ];
+
+				// console.log( vrDisplay );
+				if ( vrDisplay.stageParameters ) {
+
+					// console.log( vrDisplay.stageParameters.sittingToStandingTransform );
+					var secureGeo = new THREE.PlaneGeometry(  vrDisplay.stageParameters.sizeX, vrDisplay.stageParameters.sizeZ, 32, 32 );
+					secureGeo.rotateX( - Math.PI / 2 );
+					var mat4 = new THREE.Matrix4();
+					var arrMat4 = vrDisplay.stageParameters.sittingToStandingTransform;
+					mat4.set( arrMat4[ 0 ], arrMat4[ 1 ], arrMat4[ 2 ], arrMat4[ 3 ], arrMat4[ 4 ], arrMat4[ 5 ], arrMat4[ 6 ], arrMat4[ 7 ], arrMat4[ 8 ], arrMat4[ 9 ], arrMat4[ 10 ], arrMat4[ 11 ], arrMat4[ 12 ], arrMat4[ 13 ], arrMat4[ 14 ], arrMat4[ 15 ] );
+					secureGeo.applyMatrix( mat4 );
+
+					var secure = new THREE.Mesh( secureGeo, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
+					// console.log( secure.geometry );
+					secure.receiveShadow = true;
+					scene.add( secure );
+
+				}
+
+			}
+
+		} );
+
 	} else {
 
 		vrFallback();
@@ -135,12 +164,6 @@ function init() {
 	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } ) );
 	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
-
-	var circleGeometry = new THREE.CircleGeometry( 2, 32 );
-	circleGeometry.rotateX( - Math.PI / 2 );
-	var secure = new THREE.Mesh( circleGeometry, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
-	secure.receiveShadow = true;
-	scene.add( secure );
 
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
@@ -219,6 +242,13 @@ function onDocumentKeyUp( event ) {
 
 }
 
+function enterVR() {
+
+	//dispatch from WebVR.js
+	onWindowResize();
+
+}
+
 function onWindowResize() {
 
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -226,7 +256,22 @@ function onWindowResize() {
 
 	if ( vrMode ) {
 
-		effect.setSize( window.innerWidth, window.innerHeight );
+		if ( vrDisplay && vrDisplay.isPresenting ) {
+
+			var leftEye = vrDisplay.getEyeParameters( "left" );
+			var rightEye = vrDisplay.getEyeParameters( "right" );
+
+			var width = Math.max( leftEye.renderWidth, rightEye.renderWidth ) * 2;
+			var height = Math.max( leftEye.renderHeight, rightEye.renderHeight );
+
+			effect.setSize( width, height );
+
+		}else {
+
+			effect.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
 
 	} else {
 

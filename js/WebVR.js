@@ -87,6 +87,8 @@ var WEBVR = {
 		button.onclick = function() {
 
 			effect.setFullScreen( true );
+			//Add to main.js
+			enterVR();
 
 		};
 

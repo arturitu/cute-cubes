@@ -84,9 +84,9 @@ MoodManager.prototype.init = function ( ) {
 	if ( this.parent.name === 'cube0' ) {
 
 		this.mySpeech = new SpeechManager();
-		this.myRecognizer = new RecognitionManager();
-		this.myRecognizer.start();
-		this.myRecognizer.addEventListener( 'recognized', this.textRecognized.bind( this ) );
+		// this.myRecognizer = new RecognitionManager();
+		// this.myRecognizer.start();
+		// this.myRecognizer.addEventListener( 'recognized', this.textRecognized.bind( this ) );
 
 	}
 
