@@ -272,6 +272,11 @@ function onWindowResize() {
 
 		}
 
+		// console.log( container.childNodes[ 0 ] )
+		// container.childNodes[ 0 ].width  = window.innerWidth;
+		// container.childNodes[ 0 ].height = window.innerHeight;
+		// container.childNodes[ 0 ].style.width = window.innerWidth;
+		// container.childNodes[ 0 ].style.height = window.innerHeight;
 
 	} else {
 

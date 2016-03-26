@@ -107,7 +107,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !deprecatedAPI ) {
+			if ( ! deprecatedAPI ) {
 
 				if ( boolean ) {
 
@@ -140,7 +140,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-		});
+		} );
 
 	};
 
@@ -180,7 +180,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
-			if ( !deprecatedAPI ) {
+			if ( ! deprecatedAPI ) {
 
 				eyeTranslationL.fromArray( eyeParamsL.offset );
 				eyeTranslationR.fromArray( eyeParamsR.offset );
@@ -241,7 +241,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !deprecatedAPI ) {
+			if ( ! deprecatedAPI ) {
 
 				vrHMD.submitFrame();
 
