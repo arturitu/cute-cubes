@@ -4,7 +4,7 @@ var clock, container, camera, scene, renderer, controls, effect, listener, loade
 var vrMode = false;
 var vrDisplay = null;
 var	toogle = 0;
-var userHeight = 1.3;
+var userHeight = 1.8;
 var totalCubes = 20;
 var sky;
 var cuteCubeMesh;
@@ -71,7 +71,7 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 1000000 );
 	camera.layers.enable( 1 );
-	camera.position.set ( 0, userHeight, 0 );
+	// camera.position.set ( 0, userHeight, 0 );
 
 	listener = new THREE.AudioListener();
 	camera.add( listener );
@@ -104,19 +104,18 @@ function init() {
 				vrDisplay = displays[ 0 ];
 
 				// console.log( vrDisplay );
+
 				if ( vrDisplay.stageParameters ) {
 
 					// console.log( vrDisplay.stageParameters.sittingToStandingTransform );
 					var secureGeo = new THREE.PlaneGeometry(  vrDisplay.stageParameters.sizeX, vrDisplay.stageParameters.sizeZ, 32, 32 );
 					secureGeo.rotateX( - Math.PI / 2 );
-					var mat4 = new THREE.Matrix4();
-					var arrMat4 = vrDisplay.stageParameters.sittingToStandingTransform;
-					mat4.set( arrMat4[ 0 ], arrMat4[ 1 ], arrMat4[ 2 ], arrMat4[ 3 ], arrMat4[ 4 ], arrMat4[ 5 ], arrMat4[ 6 ], arrMat4[ 7 ], arrMat4[ 8 ], arrMat4[ 9 ], arrMat4[ 10 ], arrMat4[ 11 ], arrMat4[ 12 ], arrMat4[ 13 ], arrMat4[ 14 ], arrMat4[ 15 ] );
-					secureGeo.applyMatrix( mat4 );
 
 					var secure = new THREE.Mesh( secureGeo, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
 					// console.log( secure.geometry );
+					secure.position.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
 					secure.receiveShadow = true;
+					// console.log( secure.position );
 					scene.add( secure );
 
 				}
@@ -364,6 +363,54 @@ function render( timestamp ) {
 	if ( vrMode ) {
 
 		effect.render( scene, camera );
+		var gamepads = navigator.getGamepads();
+		for ( var i = 0; i < gamepads.length; ++ i ) {
+
+			var gamepad = gamepads[ i ];
+			if ( gamepad && gamepad.pose ) {
+
+				// Because this sample is done in standing space we need to apply
+				// the same transformation to the gamepad pose as we did the
+				// VRDisplay's pose.
+				// getPoseMatrix(gamepadMat, gamepad.pose);
+
+				// Loop through all the gamepad's axes and rotate the cube by their
+				// value.
+				for ( var j = 0; j < gamepad.axes.length; ++ j ) {
+
+					switch ( j % 3 ) {
+						case 0:
+							mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							break;
+						case 1:
+							mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							break;
+						case 2:
+							mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							break;
+					}
+
+				}
+
+				// Show the gamepad's cube as red if any buttons are pressed, blue
+				// otherwise.
+				vec4.set( gamepadColor, 0, 0, 1, 1 );
+				for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
+
+					if ( gamepad.buttons[ j ].pressed ) {
+
+						vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
+						break;
+
+					}
+
+				}
+
+				debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
+
+			}
+
+		}
 
 	} else {
 
