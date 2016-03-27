@@ -158,12 +158,19 @@ function init() {
 	scene.add( pointL1 );
 
 	//Ground
+	var objectLoader = new THREE.ObjectLoader();
+	objectLoader.load( "assets/cuteCubeLand2.json", function ( obj ) {
 
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 50, 50 );
-	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } ) );
-	positionalGround.receiveShadow = true;
-	scene.add( positionalGround );
+		console.log( obj );
+		obj.children[ 0 ].receiveShadow = true;
+		scene.add( obj );
+
+	} );
+	// var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 50, 50 );
+	// planePosGeometry.rotateX( - Math.PI / 2 );
+	// positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+	// positionalGround.receiveShadow = true;
+	// scene.add( positionalGround );
 
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
