@@ -95,6 +95,7 @@ function init() {
 	if ( navigator.getVRDisplays || navigator.getVRDevices ) {
 
 		controls = new THREE.VRControls( camera, vrFallback );
+		controls.standing = true;
 		vrMode = true;
 
 		navigator.getVRDisplays().then( function ( displays ) {
