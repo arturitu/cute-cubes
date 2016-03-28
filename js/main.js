@@ -9,7 +9,7 @@ var totalCubes = 20;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
-var ground, positionalGround;
+var ground, secureArea;
 var light, pointL1, pointL2, pointL3;
 var lightsArr = [];
 var isPaused = false;
@@ -109,16 +109,14 @@ function init() {
 
 				if ( vrDisplay.stageParameters ) {
 
-					// console.log( vrDisplay.stageParameters.sittingToStandingTransform );
+					// console.log( vrDisplay.stageParameters );
 					var secureGeo = new THREE.PlaneGeometry(  vrDisplay.stageParameters.sizeX, vrDisplay.stageParameters.sizeZ, 32, 32 );
 					secureGeo.rotateX( - Math.PI / 2 );
 
-					var secure = new THREE.Mesh( secureGeo, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
-					// console.log( secure.geometry );
-					secure.position.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
-					secure.receiveShadow = true;
-					// console.log( secure.position );
-					scene.add( secure );
+					secureArea = new THREE.Mesh( secureGeo, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
+					secureArea.receiveShadow = true;
+					secureArea.position.y = - 0.01;
+					scene.add( secureArea );
 
 				}
 
@@ -167,12 +165,6 @@ function init() {
 		scene.add( obj );
 
 	} );
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 2, 3, 50, 50 );
-	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0x9999aa } ) );
-	positionalGround.position.y = - 0.01;
-	positionalGround.receiveShadow = true;
-	scene.add( positionalGround );
 
 	//gamepads
 	gamepadL = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
