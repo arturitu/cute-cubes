@@ -3,42 +3,35 @@
 var clock, container, camera, scene, renderer, controls, effect, listener, loader;
 var vrMode = false;
 var vrDisplay = null;
-var	toogle = 0;
-var userHeight = 1.8;
+//Strings with the different moments of the experience
+//0 - far cubes asking who are you
+//1 - close cubes saying mmmm interesting
+//2 - closest cubes laugh and saiyng I looove u
+var stage = 0;
+
+var userHeight = 1.7;
 var totalCubes = 20;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
 var ground, secureArea;
-var light, pointL1, pointL2, pointL3;
+var light, pointL1;
 var lightsArr = [];
 var isPaused = false;
-var initMinRadius = 0.1;
-var initMaxRadius = 0.5;
+var initMinRadius = 4;
+var initMaxRadius = 7;
 var originPos;
 var worldPosition = new THREE.Vector3();
 var totalTime = 0;
+
+var keyManager;
+
 var gamepadL,gamepadR;
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
-var moveForward = false;
-var moveBackwards = false;
-var moveLeft = false;
-var moveRight = false;
-var radiusLimit = 2;
 
 var SHADOW_MAP_WIDTH = 4096, SHADOW_MAP_HEIGHT = 4096;
-
-// if ( ('speechSynthesis' in window) && ('webkitSpeechRecognition' in window) ) {
-//
-// 	console.log( 'yea' );
-//
-// } else {
-//
-// 	console.log( 'non' );
-//
-// }
 
 if ( WEBVR.isLatestAvailable() === false ) {
 
@@ -72,7 +65,6 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 1000000 );
 	camera.layers.enable( 1 );
-	// camera.position.set ( 0, userHeight, 0 );
 
 	listener = new THREE.AudioListener();
 	camera.add( listener );
@@ -105,12 +97,13 @@ function init() {
 
 				vrDisplay = displays[ 0 ];
 
-				// console.log( vrDisplay );
-
 				if ( vrDisplay.stageParameters ) {
 
 					// console.log( vrDisplay.stageParameters );
 					var secureGeo = new THREE.PlaneGeometry(  vrDisplay.stageParameters.sizeX, vrDisplay.stageParameters.sizeZ, 32, 32 );
+					initMinRadius = Math.max( vrDisplay.stageParameters.sizeX, vrDisplay.stageParameters.sizeZ );
+					initMaxRadius = initMinRadius + 4;
+
 					secureGeo.rotateX( - Math.PI / 2 );
 
 					secureArea = new THREE.Mesh( secureGeo, new THREE.MeshLambertMaterial( { color: 0x999999 } ) );
@@ -126,18 +119,16 @@ function init() {
 
 	} else {
 
+		camera.position.set ( 0, userHeight, 0 );
 		vrFallback();
 
 	}
 
-	var skyGeo = new THREE.SphereGeometry( 450, 32, 15 );
-
 	//Sky
+	var skyGeo = new THREE.SphereGeometry( 450, 32, 15 );
 	var skyBox = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoleft.png' ), side: THREE.BackSide } ) );
 	skyBox.layers.set( 1 );
 	scene.add( skyBox );
-
-
 	var skyBoxR = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoright.png' ), side: THREE.BackSide } ) );
 	skyBoxR.layers.set( 2 );
 	scene.add( skyBoxR );
@@ -158,23 +149,24 @@ function init() {
 
 	//Ground
 	var objectLoader = new THREE.ObjectLoader();
-	objectLoader.load( "assets/cuteCubeLand2.json", function ( obj ) {
+	objectLoader.load( "assets/ground.json", function ( obj ) {
 
-		obj.children[ 0 ].receiveShadow = true;
-		obj.children[ 0 ].geometry.computeVertexNormals();
-		scene.add( obj );
+		ground = obj.children[ 0 ];
+		ground.receiveShadow = true;
+		ground.geometry.computeVertexNormals();
+		scene.add( ground );
 
 	} );
 
 	//gamepads
 	gamepadL = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-	scene.add( gamepadL );
+	// scene.add( gamepadL );
 	gamepadR = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
-	scene.add( gamepadR );
+	// scene.add( gamepadR );
 
 	// Cute cubes
 	cuteCubeMesh = new CuteCubeMesh();
-	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
+	cuteCubeMesh.addEventListener( 'ready', addCuteCubes.bind( this ) );
 
 	if ( WEBVR.isAvailable() === true ) {
 
@@ -189,7 +181,7 @@ function init() {
 
 }
 
-function cuteCubeMeshReady() {
+function addCuteCubes() {
 
 	for ( var i = 0; i < totalCubes; i ++ ) {
 
@@ -215,38 +207,12 @@ function randomRange ( min, max ) {
 
 function vrFallback() {
 
-	document.addEventListener( 'keydown', onDocumentKeyDown, false );
-	document.addEventListener( 'keyup', onDocumentKeyUp, false );
-	// camera.position.set( 0, 2, 0 );
-	// controls = new THREE.OrbitControls( camera );
 	mouse.x = 0;
 	mouse.y = 0;
 	controls = new THREE.TouchControls( camera, mouse, 0 );
 
-}
-
-function onDocumentKeyDown( event ) {
-
-	switch ( event.keyCode ) {
-
-		case 38: moveForward = true; break; // up
-		case 40: moveBackwards = true; break; // down
-		case 37: moveLeft = true; break; // left
-		case 39: moveRight = true; break; // right
-	}
-
-}
-
-function onDocumentKeyUp( event ) {
-
-	switch ( event.keyCode ) {
-
-		case 38: moveForward = false; break; // up
-		case 40: moveBackwards = false; break; // down
-		case 37: moveLeft = false; break; // left
-		case 39: moveRight = false; break; // right
-
-	}
+	//Only for debug purposes
+	keyManager = new KeyManager( camera );
 
 }
 
@@ -279,7 +245,7 @@ function onWindowResize() {
 			effect.setSize( window.innerWidth, window.innerHeight );
 
 		}
-
+		//TODO trying to improve mirroring
 		// console.log( container.childNodes[ 0 ] )
 		// container.childNodes[ 0 ].width  = window.innerWidth;
 		// container.childNodes[ 0 ].height = window.innerHeight;
@@ -310,124 +276,14 @@ function animate( timestamp ) {
 
 function render( timestamp ) {
 
-	// TODO FIX position when looks down (change z, x position)
-	if ( camera.position.z > - radiusLimit && camera.position.z < radiusLimit ) {
-
-		if ( moveForward ) {
-
-			camera.position.z -= 0.05 * Math.cos( camera.rotation.y );
-			camera.position.x -= 0.05 * Math.sin( camera.rotation.y );
-
-		}
-		if ( moveBackwards ) {
-
-			camera.position.z += 0.05 * Math.cos( camera.rotation.y );
-			camera.position.x += 0.05 * Math.sin( camera.rotation.y );
-
-		}
-
-		if ( camera.position.z < - radiusLimit ) {
-
-			camera.position.z = - radiusLimit + 0.02;
-
-		}
-
-		if ( camera.position.z > radiusLimit ) {
-
-			camera.position.z = radiusLimit - 0.02;
-
-		}
-
-	}
-
-	if ( camera.position.x > - radiusLimit && camera.position.x < radiusLimit ) {
-
-		if ( moveLeft ) {
-
-			camera.position.x -= 0.05 * Math.cos( camera.rotation.y );
-			camera.position.z += 0.05 * Math.sin( camera.rotation.y );
-
-		}
-		if ( moveRight ) {
-
-			camera.position.x += 0.05 * Math.cos( camera.rotation.y );
-			camera.position.z -= 0.05 * Math.sin( camera.rotation.y );
-
-		}
-
-		if ( camera.position.x < - radiusLimit ) {
-
-			camera.position.x = - radiusLimit + 0.02;
-
-		}
-
-		if ( camera.position.x > radiusLimit ) {
-
-			camera.position.x = radiusLimit - 0.02;
-
-		}
-
-	}
-
 	if ( vrMode ) {
 
+		updateGamepads();
 		effect.render( scene, camera );
-		var gamepads = navigator.getGamepads();
-		for ( var i = 0; i < gamepads.length; ++ i ) {
-
-			var gamepad = gamepads[ i ];
-			// console.log( gamepad );
-			if ( gamepad && gamepad.pose ) {
-
-				// Because this sample is done in standing space we need to apply
-				// the same transformation to the gamepad pose as we did the
-				// VRDisplay's pose.
-				// getPoseMatrix(gamepadMat, gamepad.pose);
-
-				// Loop through all the gamepad's axes and rotate the cube by their
-				// value.
-				for ( var j = 0; j < gamepad.axes.length; ++ j ) {
-
-					switch ( j % 3 ) {
-						case 0:
-							// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-							console.log( gamepad.axes[ j ] * Math.PI );
-							break;
-						case 1:
-							// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-							console.log( gamepad.axes[ j ] * Math.PI );
-							break;
-						case 2:
-							// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-							console.log( gamepad.axes[ j ] * Math.PI );
-							break;
-					}
-
-				}
-
-				// Show the gamepad's cube as red if any buttons are pressed, blue
-				// otherwise.
-				// vec4.set( gamepadColor, 0, 0, 1, 1 );
-				for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
-
-					if ( gamepad.buttons[ j ].pressed ) {
-
-						console.log( 'PRESSED', i, j );
-						// vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
-						break;
-
-					}
-
-				}
-
-				// debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
-
-			}
-
-		}
 
 	} else {
 
+		keyManager.update();
 		renderer.render( scene, camera );
 
 	}
@@ -436,25 +292,87 @@ function render( timestamp ) {
 
 	totalTime = Math.round( timestamp / 1000 );
 	// console.log(totalTime);
+	if ( totalTime < 60 ) {
+
+		stage = 0;
+
+	} else if ( totalTime >= 60 && totalTime < 120 ) {
+
+		stage = 1;
+
+	}else if ( totalTime >= 120 ) {
+
+		stage = 2;
+
+	}
 	for ( var i = 0; i < cubesArr.length; i ++ ) {
 
-		if ( totalTime > 60 && totalTime < 120 ) {
-
-			cubesArr[ i ].setSecureDistance( 1 );
-
-		}
-		if ( totalTime > 120 ) {
-
-			cubesArr[ i ].setSecureDistance( 0.3 );
-
-		}
 		cubesArr[ i ].applyBehaviors( cubesArr );
+		cubesArr[ i ].setSecureDistance( stage );
 		cubesArr[ i ].update( timestamp );
 		var godPos = worldPosition.setFromMatrixPosition( camera.matrixWorld );
 		cubesArr[ i ].lookAt( new THREE.Vector3( godPos.x,0,godPos.z ) );
 
 	}
-	// console.log(renderer.info.memory);
+
+}
+
+
+function updateGamepads() {
+
+	var gamepads = navigator.getGamepads();
+	for ( var i = 0; i < gamepads.length; ++ i ) {
+
+		var gamepad = gamepads[ i ];
+		// console.log( gamepad );
+		if ( gamepad && gamepad.pose ) {
+
+			// Because this sample is done in standing space we need to apply
+			// the same transformation to the gamepad pose as we did the
+			// VRDisplay's pose.
+			// getPoseMatrix(gamepadMat, gamepad.pose);
+
+			// Loop through all the gamepad's axes and rotate the cube by their
+			// value.
+			for ( var j = 0; j < gamepad.axes.length; ++ j ) {
+
+				switch ( j % 3 ) {
+					case 0:
+						// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+						console.log( gamepad.axes[ j ] * Math.PI );
+						break;
+					case 1:
+						// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+						console.log( gamepad.axes[ j ] * Math.PI );
+						break;
+					case 2:
+						// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+						console.log( gamepad.axes[ j ] * Math.PI );
+						break;
+				}
+
+			}
+
+			// Show the gamepad's cube as red if any buttons are pressed, blue
+			// otherwise.
+			// vec4.set( gamepadColor, 0, 0, 1, 1 );
+			for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
+
+				if ( gamepad.buttons[ j ].pressed ) {
+
+					console.log( 'PRESSED', i, j );
+					// vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
+					break;
+
+				}
+
+			}
+
+			// debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
+
+		}
+
+	}
 
 }
 

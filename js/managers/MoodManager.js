@@ -83,7 +83,7 @@ MoodManager.prototype.init = function ( ) {
 
 	if ( this.parent.name === 'cube0' ) {
 
-		this.mySpeech = new SpeechManager();
+		// this.mySpeech = new SpeechManager();
 		// this.myRecognizer = new RecognitionManager();
 		// this.myRecognizer.start();
 		// this.myRecognizer.addEventListener( 'recognized', this.textRecognized.bind( this ) );
@@ -222,7 +222,7 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 
 			}
 			this.soundLaugh.play();
-			this.arrExpressions = [ 'laugh1','laugh2','laugh1','laugh2' ];
+			this.arrExpressions = [ 'laugh1','laugh2','laugh1','laugh2', 'idle' ];
 			var scope = this;
 			this.soundLaugh.source.onended = function() {
 
@@ -324,24 +324,7 @@ MoodManager.prototype.doMood = function ( mustMood ) {
 
 			};
 			break;
-		case 'speech':
-			this.mySpeech.speak( this.speechRecognized );
 
-			var scope = this;
-			this.mySpeech.msg.onstart = function ( e ) {
-
-				scope.isMoodActive = true;
-				scope.arrExpressions = scope.getPhonemes( scope.speechRecognized );
-
-			}
-			this.mySpeech.msg.onend = function () {
-
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			}
-			break;
 	}
 
 }
@@ -403,17 +386,6 @@ MoodManager.prototype.getPhonemes = function ( s ) {
 
 }
 
-//To control pause
-MoodManager.prototype.pauseAll = function ( bool ) {
-
-	if ( bool ) {
-
-	}else {
-
-	}
-
-}
-
 //To control moods
 MoodManager.prototype.changeEyes = function ( index ) {
 
@@ -438,7 +410,7 @@ MoodManager.prototype.renderExpression = function ( expression ) {
 	switch ( expression ) {
 		case 'idle':
 			this.changeEyes( 1 );
-			this.changeMouth( 2 );
+			this.changeMouth( 9 );
 			break;
 		case 'blink':
 			this.changeEyes( 5 );

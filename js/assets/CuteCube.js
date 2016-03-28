@@ -3,7 +3,7 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	'use strict';
 	//Seek and Separation parameters
 
-	this.secureDistanceToGod = 1;
+	this.secureDistanceToGod = 3;
 	this.maxSpeed = 0.005;
 	this.maxForce = 0.0048;
 	this.acceleration = new THREE.Vector2();
@@ -13,13 +13,14 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	this.desiredSeparation = 0.3;
 	this.godToFollow = godtoFollow;
 
+	this.stage = 0;
+
 	THREE.Mesh.call( this, mesh.geometry, mesh.material.clone() );
 	this.name = 'cube' + index;
 
 	if ( this.name === 'cube0' ) {
 
 		this.scale.set( 2, 2, 2 );
-		// this.material.materials[ 0 ].color = new THREE.Color( 0xcc0000 );
 
 	}
 
@@ -42,9 +43,9 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 
 	this.prevPosition =  new THREE.Vector3();
 
-	// this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
-	// this.add( this.moodManager );
-	// this.moodManager.init();
+	this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
+	this.add( this.moodManager );
+	this.moodManager.init();
 
 };
 
@@ -165,24 +166,29 @@ CuteCube.prototype.update = function ( timestamp ) {
 
 	// Reset acceleration to 0 each cycle
 	this.acceleration.multiplyScalar( 0 );
-	// this.position.y = 0;
-	// console.log(this.position);
-	// this.moodManager.update( timestamp );
+	this.moodManager.update( timestamp );
 
 }
 //END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 
-CuteCube.prototype.pauseAll = function ( bool ) {
-
-	// this.moodManager.pauseAll( bool );
-
-}
-
 CuteCube.prototype.setSecureDistance = function ( i ) {
 
-	if ( this.secureDistanceToGod !== i ) {
+	if ( this.stage !== i ) {
 
-		this.secureDistanceToGod = i;
+		this.stage = i;
+		switch ( this.stage ) {
+			case 0:
+				this.secureDistanceToGod = 3;
+				break;
+			case 1:
+				this.secureDistanceToGod = 1;
+				break;
+			case 2:
+				this.secureDistanceToGod = 0.3;
+				break;
+			default:
+
+		}
 
 	}
 
