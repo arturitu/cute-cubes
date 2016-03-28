@@ -18,6 +18,7 @@ var initMaxRadius = 0.5;
 var originPos;
 var worldPosition = new THREE.Vector3();
 var totalTime = 0;
+var gamepadL,gamepadR;
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
@@ -165,6 +166,13 @@ function init() {
 	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
 
+	//gamepads
+	gamepadL = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+	scene.add( gamepadL );
+	gamepadR = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
+	scene.add( gamepadR );
+
+	// Cute cubes
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
 
@@ -368,6 +376,7 @@ function render( timestamp ) {
 		for ( var i = 0; i < gamepads.length; ++ i ) {
 
 			var gamepad = gamepads[ i ];
+			// console.log( gamepad );
 			if ( gamepad && gamepad.pose ) {
 
 				// Because this sample is done in standing space we need to apply
@@ -381,13 +390,16 @@ function render( timestamp ) {
 
 					switch ( j % 3 ) {
 						case 0:
-							mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							console.log( gamepad.axes[ j ] * Math.PI );
 							break;
 						case 1:
-							mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							console.log( gamepad.axes[ j ] * Math.PI );
 							break;
 						case 2:
-							mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+							console.log( gamepad.axes[ j ] * Math.PI );
 							break;
 					}
 
@@ -395,19 +407,20 @@ function render( timestamp ) {
 
 				// Show the gamepad's cube as red if any buttons are pressed, blue
 				// otherwise.
-				vec4.set( gamepadColor, 0, 0, 1, 1 );
+				// vec4.set( gamepadColor, 0, 0, 1, 1 );
 				for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
 
 					if ( gamepad.buttons[ j ].pressed ) {
 
-						vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
+						console.log( 'PRESSED', i, j );
+						// vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
 						break;
 
 					}
 
 				}
 
-				debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
+				// debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
 
 			}
 
