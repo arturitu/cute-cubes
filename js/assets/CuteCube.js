@@ -136,7 +136,7 @@ CuteCube.prototype.seek = function ( godPosition ) {
 	// 	console.log( desired.length() );
 	//
 	// }
-	if ( desired.length() > 0.6  ) {
+	if ( desired.length() > 1.4  ) {
 
 		this.moodManager.isFar = true;
 
@@ -149,7 +149,16 @@ CuteCube.prototype.seek = function ( godPosition ) {
 
 		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
 		// desired.setLength(m);
-		desired.setLength( - 0.01 );
+		switch ( this.stage ) {
+			case 0:
+				desired.setLength( - 0.01 );
+				break;
+			case 1:
+				desired.setLength( - 0.005 );
+				break;
+			default:
+				desired.setLength( - 0.001 );
+		}
 
 		this.moodManager.seeking = false;
 
@@ -195,13 +204,13 @@ CuteCube.prototype.setSecureDistance = function ( i ) {
 		this.moodManager.stage = this.stage;
 		switch ( this.stage ) {
 			case 0:
-				this.secureDistanceToGod = 1.3;
+				this.secureDistanceToGod = 0.5;
 				break;
 			case 1:
-				this.secureDistanceToGod = 0.8;
+				this.secureDistanceToGod = 0.4;
 				break;
 			case 2:
-				this.secureDistanceToGod = 0.4;
+				this.secureDistanceToGod = 0.3;
 				break;
 			default:
 

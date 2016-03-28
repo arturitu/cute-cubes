@@ -10,7 +10,7 @@ var vrDisplay = null;
 var stage = 0;
 
 var userHeight = 1.7;
-var totalCubes = 20;
+var totalCubes = 15;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -292,15 +292,15 @@ function render( timestamp ) {
 
 	totalTime = Math.round( timestamp / 1000 );
 	// console.log(totalTime);
-	if ( totalTime < 30 ) {
+	if ( totalTime < 45 ) {
 
 		stage = 0;
 
-	} else if ( totalTime >= 30 && totalTime < 60 ) {
+	} else if ( totalTime >= 45 && totalTime < 75 ) {
 
 		stage = 1;
 
-	}else if ( totalTime >= 60 ) {
+	}else if ( totalTime >= 75 ) {
 
 		stage = 2;
 

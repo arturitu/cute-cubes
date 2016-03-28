@@ -73,7 +73,7 @@ var MoodManager = function ( index, totalCubes, eyesMap, mouthMap, listener ) {
 
 	if ( this.index === 0 ) {
 
-		this.timerMood = 3000;
+		this.timerMood = 5000;
 
 	}else {
 
