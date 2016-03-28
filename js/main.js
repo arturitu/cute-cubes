@@ -161,16 +161,17 @@ function init() {
 	var objectLoader = new THREE.ObjectLoader();
 	objectLoader.load( "assets/cuteCubeLand2.json", function ( obj ) {
 
-		console.log( obj );
 		obj.children[ 0 ].receiveShadow = true;
+		obj.children[ 0 ].geometry.computeVertexNormals();
 		scene.add( obj );
 
 	} );
-	// var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 50, 50 );
-	// planePosGeometry.rotateX( - Math.PI / 2 );
-	// positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
-	// positionalGround.receiveShadow = true;
-	// scene.add( positionalGround );
+	var planePosGeometry = new THREE.PlaneBufferGeometry( 2, 3, 50, 50 );
+	planePosGeometry.rotateX( - Math.PI / 2 );
+	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0x9999aa } ) );
+	positionalGround.position.y = - 0.01;
+	positionalGround.receiveShadow = true;
+	scene.add( positionalGround );
 
 	cuteCubeMesh = new CuteCubeMesh();
 	cuteCubeMesh.addEventListener( 'ready', cuteCubeMeshReady.bind( this ) );
