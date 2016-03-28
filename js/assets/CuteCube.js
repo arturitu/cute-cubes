@@ -10,7 +10,7 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	this.velocity = new THREE.Vector2();
 	this.separateFactor = 0.1;
 	this.seekFactor = 0.1;
-	this.desiredSeparation = 0.3;
+	this.desiredSeparation = 0.6;
 	this.godToFollow = godtoFollow;
 
 	this.stage = 0;
@@ -19,6 +19,10 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 	this.name = 'cube' + index;
 
 	if ( this.name === 'cube0' ) {
+
+		this.scale.set( 4, 4, 4 );
+
+	}else {
 
 		this.scale.set( 2, 2, 2 );
 
@@ -43,9 +47,8 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 
 	this.prevPosition =  new THREE.Vector3();
 
-	this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
+	this.moodManager = new MoodManager( index, totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
 	this.add( this.moodManager );
-	this.moodManager.init();
 
 };
 
@@ -128,21 +131,34 @@ CuteCube.prototype.seek = function ( godPosition ) {
 	var desired = new THREE.Vector2();
 	var myPos2D = new THREE.Vector2( this.position.x,this.position.z );
 	desired = desired.subVectors( godPosition, myPos2D );  // A vector pointing from the location to the target
-	// console.log( desired.length() );
+	// if ( this.name === 'cube0' ) {
+	//
+	// 	console.log( desired.length() );
+	//
+	// }
+	if ( desired.length() > 0.6  ) {
+
+		this.moodManager.isFar = true;
+
+	}else {
+
+		this.moodManager.isFar = false;
+
+	}
 	if ( desired.length() < this.secureDistanceToGod ) {
 
 		// var m = THREE.Math.mapLinear( desired.length(), 0, this.secureDistanceToGod, 0, this.maxSpeed );
 		// desired.setLength(m);
 		desired.setLength( - 0.01 );
 
-		// this.moodManager.seeking = false;
+		this.moodManager.seeking = false;
 
 	}else {
 
 		// Normalize desired and scale to maximum speed
 		desired.setLength( this.maxSpeed );
 
-		// this.moodManager.seeking = true;
+		this.moodManager.seeking = true;
 
 	}
 
@@ -176,15 +192,16 @@ CuteCube.prototype.setSecureDistance = function ( i ) {
 	if ( this.stage !== i ) {
 
 		this.stage = i;
+		this.moodManager.stage = this.stage;
 		switch ( this.stage ) {
 			case 0:
-				this.secureDistanceToGod = 3;
+				this.secureDistanceToGod = 1.3;
 				break;
 			case 1:
-				this.secureDistanceToGod = 1;
+				this.secureDistanceToGod = 0.8;
 				break;
 			case 2:
-				this.secureDistanceToGod = 0.3;
+				this.secureDistanceToGod = 0.4;
 				break;
 			default:
 

@@ -1,8 +1,11 @@
-var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
+var MoodManager = function ( index, totalCubes, eyesMap, mouthMap, listener ) {
 
 	'use strict';
 
 	THREE.Object3D.call( this );
+
+	this.index = index;
+	this.stage = 0;
 
 	this.eyesMap = eyesMap;
 	this.mouthMap = mouthMap;
@@ -15,89 +18,83 @@ var MoodManager = function ( totalCubes, eyesMap, mouthMap, listener ) {
 	this.mouthsPerColumn = 4;
 	this.mouthsPerRow = 4;
 
-	this.soundLaugh = new THREE.PositionalAudio( listener );
-	this.soundLaugh.load( 'audio/hehehe.ogg' );
-	this.soundLaugh.setRefDistance( 0.5 );
-	this.add( this.soundLaugh );
+	this.soundsIndexArr = [
+		'whoBoss',
+		'who01',
+		'who02',
+		'who03',
+		'closeBoss',
+		'close01',
+		'close02',
+		'niceBoss',
+		'nice01',
+		'nice02',
+		'backBoss',
+		'back01',
+		'loveBoss',
+		'love01',
+		'love02'
+	];
 
-	this.soundGueGue = new THREE.PositionalAudio( listener );
-	this.soundGueGue.load( 'audio/guegue.ogg' );
-	this.soundGueGue.setRefDistance( 0.5 );
-	this.soundGueGue.source.loop = false;
-	this.soundGueGue.autoplay = false;
-	this.add( this.soundGueGue );
+	this.soundToExpressionsArr = [];
+	this.soundToExpressionsArr [ 'whoBoss' ] = this.getPhonemes( 'Whooooo arrrrr youuuuuu' );
+	this.soundToExpressionsArr [ 'who01' ] = this.getPhonemes( 'Whoooooooo Whoooooooo' );
+	this.soundToExpressionsArr [ 'who02' ] = this.getPhonemes( 'Whoooooooooooo' );
+	this.soundToExpressionsArr [ 'who03' ] = this.getPhonemes( ' Whoooooooo' );
+	this.soundToExpressionsArr [ 'closeBoss' ] = this.getPhonemes( 'tooo clooose too cloose' );
+	this.soundToExpressionsArr [ 'close01' ] = this.getPhonemes( 'cloose clooosee' );
+	this.soundToExpressionsArr [ 'close02' ] = this.getPhonemes( 'cloooose' );
+	this.soundToExpressionsArr [ 'niceBoss' ] = this.getPhonemes( 'Niiiice toooo meeeet youuu ' );
+	this.soundToExpressionsArr [ 'nice01' ] = this.getPhonemes( 'niiiice' );
+	this.soundToExpressionsArr [ 'nice02' ] = this.getPhonemes( 'niiceeee' );
+	this.soundToExpressionsArr [ 'backBoss' ] = this.getPhonemes( 'Coome baaack ' );
+	this.soundToExpressionsArr [ 'back01' ] = this.getPhonemes( 'bbaaack' );
+	this.soundToExpressionsArr [ 'loveBoss' ] = this.getPhonemes( 'oooooooo weee looovee youuu ' );
+	this.soundToExpressionsArr [ 'love01' ] = this.getPhonemes( 'oooohooooohooh' );
+	this.soundToExpressionsArr [ 'love02' ] = this.getPhonemes( 'ooohoohohoh' );
 
-	this.soundClash_a = new THREE.PositionalAudio( listener );
-	this.soundClash_a.load( 'audio/clash_a.ogg' );
-	this.soundClash_a.setRefDistance( 0.5 );
-	this.soundClash_a.source.loop = false;
-	this.soundClash_a.autoplay = false;
-	this.add( this.soundClash_a );
+	this.soundsArr = [];
 
-	this.soundClash_b = new THREE.PositionalAudio( listener );
-	this.soundClash_b.load( 'audio/clash_b.ogg' );
-	this.soundClash_b.setRefDistance( 0.5 );
-	this.soundClash_b.source.loop = false;
-	this.soundClash_b.autoplay = false;
-	this.add( this.soundClash_b );
+	for ( var i = 0; i < this.soundsIndexArr.length; i ++ ) {
 
-	this.soundOhh = new THREE.PositionalAudio( listener );
-	this.soundOhh.load( 'audio/ohh.ogg' );
-	this.soundOhh.setRefDistance( 0.5 );
-	this.soundOhh.source.loop = false;
-	this.soundOhh.autoplay = false;
-	this.add( this.soundOhh );
+		var posAudioTmp = new THREE.PositionalAudio( listener );
+		posAudioTmp.name = this.soundsIndexArr[ i ];
+		posAudioTmp.load( 'audio/' + this.soundsIndexArr[ i ] + '.ogg' );
+		posAudioTmp.setRefDistance( 0.5 );
+		this.soundsArr.push( posAudioTmp );
 
-	this.soundName = new THREE.PositionalAudio( listener );
-	this.soundName.load( 'audio/name.ogg' );
-	this.soundName.setRefDistance( 0.5 );
-	this.soundName.source.loop = false;
-	this.soundName.autoplay = false;
-	this.add( this.soundName );
+	}
 
-	this.clashing = false;
+	this.isFar = false;
 	this.seeking = false;
 
-	this.arrExpressions = [];
+	this.expressionsArr = [];
 	this.isMoodActive = false;
 
-	this.timerMood = ( Math.random() * ( 1000 * totalCubes ) ) + 1000;
+	if ( this.index === 0 ) {
+
+		this.timerMood = 3000;
+
+	}else {
+
+		this.timerMood = ( Math.random() * ( 1000 * totalCubes ) ) + 1000;
+
+	}
+
 	this.timerArrExpressions = setInterval( this.doArrExpressions.bind( this ), 80 );
 	this.timerIdle = ( Math.random() * 500 ) + 500;
 	this.timerBlink = ( Math.random() * 1000 ) + 3000;
 
 	this.moodFrame = 0;
-	this.arrExpressionsFrame = 0;
+	this.expressionsFrameArr = 0;
 	this.idleFrame = 0;
 	this.blinkFrame = 0;
 
-	this.arrExpressionsIndex = 0;
-
-	this.speechRecognized = 'Whats your name?';
+	this.expressionsArrIndex = 0;
 
 }
 
 MoodManager.prototype = Object.create( THREE.Object3D.prototype );
-
-MoodManager.prototype.init = function ( ) {
-
-	if ( this.parent.name === 'cube0' ) {
-
-		// this.mySpeech = new SpeechManager();
-		// this.myRecognizer = new RecognitionManager();
-		// this.myRecognizer.start();
-		// this.myRecognizer.addEventListener( 'recognized', this.textRecognized.bind( this ) );
-
-	}
-
-}
-
-MoodManager.prototype.textRecognized = function ( ) {
-
-	this.speechRecognized = this.myRecognizer.final_transcript;
-	this.doMood( 'speech' );
-
-}
 
 MoodManager.prototype.update = function ( timestamp ) {
 
@@ -130,12 +127,12 @@ MoodManager.prototype.update = function ( timestamp ) {
 
 MoodManager.prototype.doArrExpressions = function () {
 
-	if ( this.arrExpressions.length > 0 ) {
+	if ( this.expressionsArr.length > 0 ) {
 
-		if ( this.arrExpressionsIndex < this.arrExpressions.length ) {
+		if ( this.expressionsArrIndex < this.expressionsArr.length ) {
 
-			this.renderExpression( this.arrExpressions[ this.arrExpressionsIndex ] );
-			this.arrExpressionsIndex ++;
+			this.renderExpression( this.expressionsArr[ this.expressionsArrIndex ] );
+			this.expressionsArrIndex ++;
 
 		}
 
@@ -164,168 +161,159 @@ MoodManager.prototype.doIdle = function () {
 
 }
 
-MoodManager.prototype.getMood = function () {
+MoodManager.prototype.getPossibleMood = function () {
 
 	var possibleMoods = [];
-	if ( this.parent.name === 'cube0' ) {
+	if ( this.index === 0 ) {
 
-		possibleMoods.push( 'speech' );
+		switch ( stage ) {
+			case 0:
+				if ( this.seeking ) {
+
+					possibleMoods.push( 'whoBoss' );
+
+				}else {
+
+					possibleMoods.push( 'closeBoss' );
+
+				}
+				possibleMoods.push( 'none' );
+				break;
+			case 1:
+				if ( this.seeking ) {
+
+					possibleMoods.push( 'niceBoss' );
+
+				}else {
+
+					possibleMoods.push( 'closeBoss' );
+
+				}
+				possibleMoods.push( 'none' );
+				break;
+			case 2:
+				if ( this.isFar ) {
+
+					possibleMoods.push( 'backBoss' );
+
+				}else {
+
+					possibleMoods.push( 'loveBoss' );
+
+				}
+				break;
+
+		}
+
+
 
 	}else {
 
-		possibleMoods.push( 'laugh' );
+		switch ( stage ) {
+			case 0:
+				if ( this.seeking ) {
+
+					possibleMoods.push( 'who01' );
+					possibleMoods.push( 'who02' );
+					possibleMoods.push( 'who03' );
+
+				}else {
+
+					possibleMoods.push( 'close01' );
+					possibleMoods.push( 'close02' );
+
+				}
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				break;
+			case 1:
+				if ( this.seeking ) {
+
+					possibleMoods.push( 'nice01' );
+					possibleMoods.push( 'nice02' );
+
+				}else {
+
+					possibleMoods.push( 'close01' );
+					possibleMoods.push( 'close02' );
+
+				}
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				break;
+			case 2:
+				if ( this.isFar ) {
+
+					possibleMoods.push( 'back01' );
+					possibleMoods.push( 'back02' );
+
+				}else {
+
+					possibleMoods.push( 'love01' );
+					possibleMoods.push( 'love02' );
+
+				}
+				possibleMoods.push( 'none' );
+				possibleMoods.push( 'none' );
+				break;
+		}
 
 	}
-
-	// if ( this.clashing ) {
-	//
-	// 	possibleMoods.push( 'clash_a' );
-	// 	possibleMoods.push( 'clash_b' );
-	//
-	// }
-	// if ( this.seeking ) {
-	//
-	// 	possibleMoods.push( 'laugh' );
-	//
-	// }
-	// possibleMoods.push( 'none' );
 	// console.log( Math.floor( Math.random() * possibleMoods.length ) );
 	var randMood = Math.floor( Math.random() * possibleMoods.length );
 	return possibleMoods[ randMood ];
 
 }
 
-MoodManager.prototype.doMood = function ( mustMood ) {
+MoodManager.prototype.getSoundByName = function ( name ) {
 
-	// console.log( mustMood );
+	for ( var i = 0; i < this.soundsArr.length; i ++ ) {
+
+		if ( this.soundsArr[ i ].name === name ) {
+
+			return this.soundsArr[ i ];
+
+		}
+
+	}
+
+}
+
+
+MoodManager.prototype.doMood = function () {
+
 	if ( this.isMoodActive ) {
 
 		return;
 
 	}
-	var name = '';
-	if ( mustMood !== undefined ) {
+	var name = this.getPossibleMood();
+	var actualSound = this.getSoundByName( name );
+	if ( ! actualSound ) {
 
-		name = mustMood;
-
-	}else {
-
-		name = this.getMood();
+		return;
 
 	}
-	switch ( name ) {
-		case 'laugh':
-			this.isMoodActive = true;
-			if ( ! this.soundLaugh.source.buffer ) {
+	this.isMoodActive = true;
+	if ( ! actualSound.source.buffer ) {
 
-				return;
-
-			}
-			this.soundLaugh.play();
-			this.arrExpressions = [ 'laugh1','laugh2','laugh1','laugh2', 'idle' ];
-			var scope = this;
-			this.soundLaugh.source.onended = function() {
-
-				scope.soundLaugh.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
-		case 'guegue':
-			this.isMoodActive = true;
-			if ( ! this.soundGueGue.source.buffer ) {
-
-				return;
-
-			}
-			this.soundGueGue.play();
-			this.arrExpressions = [ 'guegue1','guegue2','guegue1','guegue2' ];
-			var scope = this;
-			this.soundGueGue.source.onended = function() {
-
-				scope.soundGueGue.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
-		case 'clash_a':
-			this.isMoodActive = true;
-			if ( ! this.soundClash_a.source.buffer ) {
-
-				return;
-
-			}
-			this.soundClash_a.play();
-			this.arrExpressions = [ 'clash_a' ];
-			var scope = this;
-			this.soundClash_a.source.onended = function() {
-
-				scope.soundClash_a.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
-		case 'clash_b':
-			this.isMoodActive = true;
-			if ( ! this.soundClash_b.source.buffer ) {
-
-				return;
-
-			}
-			this.soundClash_b.play();
-			this.arrExpressions = [ 'clash_b' ];
-			var scope = this;
-			this.soundClash_b.source.onended = function() {
-
-				scope.soundClash_b.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
-		case 'ohh':
-			this.isMoodActive = true;
-			if ( ! this.soundOhh.source.buffer ) {
-
-				return;
-
-			}
-			this.soundOhh.play();
-			this.arrExpressions = [ 'ohh','ohh','ohh','ohh' ];
-			var scope = this;
-			this.soundOhh.source.onended = function() {
-
-				scope.soundOhh.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
-		case 'name':
-			this.isMoodActive = true;
-			console.log( this.soundName.context );
-			this.soundName.play();
-			this.arrExpressions = this.getPhonemes( 'Whats your name' );
-			var scope = this;
-			this.soundName.source.onended = function() {
-
-				scope.soundName.isPlaying = false;
-				scope.isMoodActive = false;
-				scope.arrExpressions = [];
-				scope.arrExpressionsIndex = 0;
-
-			};
-			break;
+		return;
 
 	}
+	actualSound.play();
+	this.expressionsArr = this.soundToExpressionsArr[ name ];
+	var scope = this;
+	actualSound.source.onended = function() {
+
+		actualSound.isPlaying = false;
+		scope.isMoodActive = false;
+		scope.expressionsArr = [];
+		scope.expressionsArrIndex = 0;
+
+	};
 
 }
 
@@ -381,6 +369,7 @@ MoodManager.prototype.getPhonemes = function ( s ) {
 		}
 
 	}
+	phonemesArr.push( 'idle' );
 	// console.log( phonemesArr );
 	return phonemesArr;
 
@@ -410,7 +399,17 @@ MoodManager.prototype.renderExpression = function ( expression ) {
 	switch ( expression ) {
 		case 'idle':
 			this.changeEyes( 1 );
-			this.changeMouth( 9 );
+			switch ( stage ) {
+				case 0:
+					this.changeMouth( 9 );
+					break;
+				case 1:
+					this.changeMouth( 2 );
+					break;
+				case 2:
+					this.changeMouth( 1 );
+					break;
+			}
 			break;
 		case 'blink':
 			this.changeEyes( 5 );

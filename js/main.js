@@ -292,15 +292,15 @@ function render( timestamp ) {
 
 	totalTime = Math.round( timestamp / 1000 );
 	// console.log(totalTime);
-	if ( totalTime < 60 ) {
+	if ( totalTime < 30 ) {
 
 		stage = 0;
 
-	} else if ( totalTime >= 60 && totalTime < 120 ) {
+	} else if ( totalTime >= 30 && totalTime < 60 ) {
 
 		stage = 1;
 
-	}else if ( totalTime >= 120 ) {
+	}else if ( totalTime >= 60 ) {
 
 		stage = 2;
 
