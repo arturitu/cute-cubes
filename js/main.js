@@ -159,10 +159,18 @@ function init() {
 	scene.add( pointL1 );
 
 	//Ground
+	var objectLoader = new THREE.ObjectLoader();
+	objectLoader.load( "assets/cuteCubeLand2.json", function ( obj ) {
 
-	var planePosGeometry = new THREE.PlaneBufferGeometry( 10, 10, 50, 50 );
+		obj.children[ 0 ].receiveShadow = true;
+		obj.children[ 0 ].geometry.computeVertexNormals();
+		scene.add( obj );
+
+	} );
+	var planePosGeometry = new THREE.PlaneBufferGeometry( 2, 3, 50, 50 );
 	planePosGeometry.rotateX( - Math.PI / 2 );
-	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } ) );
+	positionalGround = new THREE.Mesh( planePosGeometry, new THREE.MeshLambertMaterial( { color: 0x9999aa } ) );
+	positionalGround.position.y = - 0.01;
 	positionalGround.receiveShadow = true;
 	scene.add( positionalGround );
 

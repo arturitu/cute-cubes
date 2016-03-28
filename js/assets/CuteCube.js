@@ -42,9 +42,9 @@ var CuteCube = function ( index, totalCubes, x, z, mesh, godtoFollow, listener )
 
 	this.prevPosition =  new THREE.Vector3();
 
-	this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
-	this.add( this.moodManager );
-	this.moodManager.init();
+	// this.moodManager = new MoodManager( totalCubes, this.material.materials[ 1 ].map, this.material.materials[ 2 ].map, listener );
+	// this.add( this.moodManager );
+	// this.moodManager.init();
 
 };
 
@@ -107,15 +107,15 @@ CuteCube.prototype.separate = function ( vehicles ) {
 		sum.sub( this.velocity );
 		sum.setLength( this.maxForce );
 
-		if ( count > 2 ) {
-
-			this.moodManager.clashing = true;
-
-		}else {
-
-			this.moodManager.clashing = false;
-
-		}
+		// if ( count > 2 ) {
+		//
+		// 	this.moodManager.clashing = true;
+		//
+		// }else {
+		//
+		// 	this.moodManager.clashing = false;
+		//
+		// }
 
 	}
 	return sum;
@@ -134,14 +134,14 @@ CuteCube.prototype.seek = function ( godPosition ) {
 		// desired.setLength(m);
 		desired.setLength( - 0.01 );
 
-		this.moodManager.seeking = false;
+		// this.moodManager.seeking = false;
 
 	}else {
 
 		// Normalize desired and scale to maximum speed
 		desired.setLength( this.maxSpeed );
 
-		this.moodManager.seeking = true;
+		// this.moodManager.seeking = true;
 
 	}
 
@@ -167,14 +167,14 @@ CuteCube.prototype.update = function ( timestamp ) {
 	this.acceleration.multiplyScalar( 0 );
 	// this.position.y = 0;
 	// console.log(this.position);
-	this.moodManager.update( timestamp );
+	// this.moodManager.update( timestamp );
 
 }
 //END CODE BASED ON: natureofcode.com/book/chapter-6-autonomous-agents/
 
 CuteCube.prototype.pauseAll = function ( bool ) {
 
-	this.moodManager.pauseAll( bool );
+	// this.moodManager.pauseAll( bool );
 
 }
 
