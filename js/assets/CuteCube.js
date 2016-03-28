@@ -190,6 +190,7 @@ CuteCube.prototype.setSecureDistance = function ( i ) {
 
 		}
 
+
 	}
 
 }

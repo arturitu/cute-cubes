@@ -386,12 +386,4 @@ function pauseAll( bool ) {
 
 	}
 
-	for ( var i = 0; i < cubesArr.length; i ++ ) {
-
-		cubesArr[ i ].pauseAll( bool );
-
-	}
-
-
-
 }
