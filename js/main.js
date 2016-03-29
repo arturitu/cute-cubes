@@ -519,6 +519,8 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 }
 function playOnce( hand, animation, timeScale ) {
 
+	// TODO fix aramtures on blend files
+	return;
 	// console.log( hand, animation, timeScale );
 	var activeHand;
 	var animationActive;
