@@ -26,6 +26,7 @@ var totalTime = 0;
 
 var keyManager;
 
+var handsLoaded = false;
 var gamepadL,gamepadR;
 
 //For touch controls (fallback for testing without VR)
@@ -158,11 +159,13 @@ function init() {
 
 	} );
 
-	//gamepads
-	gamepadL = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-	// scene.add( gamepadL );
-	gamepadR = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
-	// scene.add( gamepadR );
+	// //gamepads
+	// gamepadL = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+	// // scene.add( gamepadL );
+	// gamepadR = new THREE.Mesh( new THREE.BoxGeometry( 0.1,0.1,0.1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
+	// // scene.add( gamepadR );
+	gamepadL = new THREE.BlendCharacter();
+	gamepadL.load( "assets/handL.json", loadHandR );
 
 	// Cute cubes
 	cuteCubeMesh = new CuteCubeMesh();
@@ -178,6 +181,29 @@ function init() {
 	window.addEventListener( 'resize', onWindowResize, false );
 
 	animate();
+
+}
+
+function loadHandR () {
+
+	gamepadL.castShadow = true;
+	scene.add( gamepadL );
+
+	// console.log( blendMesh.mixer.clipAction( 'close' ) );
+	// console.log( blendMesh.mixer.clipAction( 'thumb' ) );
+
+	gamepadR = new THREE.BlendCharacter();
+	gamepadR.load( "assets/handR.json", addHandR );
+	// animate();
+
+}
+
+function addHandR () {
+
+	gamepadR.castShadow = true;
+	scene.add( gamepadR );
+
+	handsLoaded = true;
 
 }
 
@@ -373,6 +399,36 @@ function updateGamepads() {
 		}
 
 	}
+
+}
+
+
+function playOnce( hand, action, timeScale ) {
+
+	var activeHand;
+	if ( hand === 0 ) {
+
+		activeHand = gamepadL;
+
+	}else {
+
+		activeHand = gamepadR;
+
+	}
+
+	if ( action === animationActive && blendMesh.mixer.clipAction( animationActive ).timeScale === timeScale ) {
+
+		return;
+
+	}
+
+	activeHand.mixer.clipAction( action ).loop = 2200;
+	activeHand.mixer.clipAction( action ).clampWhenFinished = true;
+	activeHand.mixer.clipAction( action ).timeScale = timeScale;
+	activeHand.play ( animationActive, 0 );
+	activeHand.play ( action, 1 );
+
+	animationActive = action;
 
 }
 
