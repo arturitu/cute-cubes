@@ -189,7 +189,7 @@ function loadHandR () {
 
 	gamepadL.castShadow = true;
 	scene.add( gamepadL );
-
+	// console.log( gamepadL );
 	// console.log( blendMesh.mixer.clipAction( 'close' ) );
 	// console.log( blendMesh.mixer.clipAction( 'thumb' ) );
 
@@ -366,11 +366,11 @@ function updateGamepads() {
 			var hand;
 			if ( i === 0 ) {
 
-				hand = gamepadL;
+				hand = gamepadR;
 
 			}else {
 
-				hand = gamepadR;
+				hand = gamepadL;
 
 			}
 			// console.log( gamepad );
@@ -381,34 +381,35 @@ function updateGamepads() {
 			updateGamepadPose( hand, gamepad.pose );
 			// Loop through all the gamepad's axes and rotate the cube by their
 			// value.
-			// console.log( gamepad.axes );
-			for ( var j = 0; j < gamepad.axes.length; ++ j ) {
-
-				switch ( j % 3 ) {
-					case 0:
-						// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						// console.log( gamepad.axes[ j ] * Math.PI );
-						hand.applyMatrix( new THREE.Matrix4().makeRotationX( gamepad.axes[ j ] * Math.PI ) );
-						break;
-					case 1:
-						// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						// console.log( gamepad.axes[ j ] * Math.PI );
-						hand.applyMatrix( new THREE.Matrix4().makeRotationY( gamepad.axes[ j ] * Math.PI ) );
-						break;
-					case 2:
-						// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						// console.log( gamepad.axes[ j ] * Math.PI );
-						hand.applyMatrix( new THREE.Matrix4().makeRotationZ( gamepad.axes[ j ] * Math.PI ) );
-						break;
-				}
-
-			}
+			// console.log( gamepad );
+			//TODO implement trackpad control
+			// for ( var j = 0; j < gamepad.axes.length; ++ j ) {
+			//
+			// 	switch ( j % 3 ) {
+			// 		case 0:
+			// 			// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+			// 			// console.log( gamepad.axes[ j ] * Math.PI );
+			// 			hand.applyMatrix( new THREE.Matrix4().makeRotationX( gamepad.axes[ j ] * Math.PI ) );
+			// 			break;
+			// 		case 1:
+			// 			// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+			// 			// console.log( gamepad.axes[ j ] * Math.PI );
+			// 			hand.applyMatrix( new THREE.Matrix4().makeRotationY( gamepad.axes[ j ] * Math.PI ) );
+			// 			break;
+			// 		case 2:
+			// 			// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
+			// 			// console.log( gamepad.axes[ j ] * Math.PI );
+			// 			hand.applyMatrix( new THREE.Matrix4().makeRotationZ( gamepad.axes[ j ] * Math.PI ) );
+			// 			break;
+			// 	}
+			//
+			// }
 
 			for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
 
 				if ( gamepad.buttons[ j ].pressed ) {
 
-					// console.log( 'PRESSED',  gamepad.buttons[ j ], i, j );
+					console.log( 'PRESSED',  gamepad.buttons[ j ], i, j );
 					manageButtons( i, j, gamepad.buttons[ j ].value, gamepad.buttons[ j ].pressed );
 
 				}else {
@@ -444,8 +445,8 @@ function updateGamepadPose ( pad, pose ) {
 function manageButtons( handId, buttonId, intensity, pressed ) {
 
 	// handId
-	// 0 - left
-	// 1 - right
+	// 0 - right
+	// 1 - left
 
 	// buttonId
 	// 0 - trackpad
