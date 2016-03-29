@@ -28,6 +28,7 @@ var keyManager;
 
 var handsLoaded = false;
 var gamepadL,gamepadR;
+var standingMatrix = new THREE.Matrix4();
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
@@ -304,7 +305,12 @@ function render( timestamp ) {
 
 	if ( vrMode ) {
 
-		updateGamepads();
+		if ( handsLoaded ) {
+
+			updateGamepads();
+
+		}
+
 		effect.render( scene, camera );
 
 	} else {
@@ -346,55 +352,72 @@ function render( timestamp ) {
 
 function updateGamepads() {
 
+	if ( ! vrDisplay ) {
+
+		return;
+
+	}
 	var gamepads = navigator.getGamepads();
 	for ( var i = 0; i < gamepads.length; ++ i ) {
 
 		var gamepad = gamepads[ i ];
-		// console.log( gamepad );
 		if ( gamepad && gamepad.pose ) {
 
+			var hand;
+			if ( i === 0 ) {
+
+				hand = gamepadL;
+
+			}else {
+
+				hand = gamepadR;
+
+			}
+			// console.log( gamepad );
 			// Because this sample is done in standing space we need to apply
 			// the same transformation to the gamepad pose as we did the
 			// VRDisplay's pose.
 			// getPoseMatrix(gamepadMat, gamepad.pose);
-
+			updateGamepadPose( hand, gamepad.pose );
 			// Loop through all the gamepad's axes and rotate the cube by their
 			// value.
+			// console.log( gamepad.axes );
 			for ( var j = 0; j < gamepad.axes.length; ++ j ) {
 
 				switch ( j % 3 ) {
 					case 0:
 						// mat4.rotateX( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						console.log( gamepad.axes[ j ] * Math.PI );
+						// console.log( gamepad.axes[ j ] * Math.PI );
+						hand.applyMatrix( new THREE.Matrix4().makeRotationX( gamepad.axes[ j ] * Math.PI ) );
 						break;
 					case 1:
 						// mat4.rotateY( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						console.log( gamepad.axes[ j ] * Math.PI );
+						// console.log( gamepad.axes[ j ] * Math.PI );
+						hand.applyMatrix( new THREE.Matrix4().makeRotationY( gamepad.axes[ j ] * Math.PI ) );
 						break;
 					case 2:
 						// mat4.rotateZ( gamepadMat, gamepadMat, gamepad.axes[ j ] * Math.PI );
-						console.log( gamepad.axes[ j ] * Math.PI );
+						// console.log( gamepad.axes[ j ] * Math.PI );
+						hand.applyMatrix( new THREE.Matrix4().makeRotationZ( gamepad.axes[ j ] * Math.PI ) );
 						break;
 				}
 
 			}
 
-			// Show the gamepad's cube as red if any buttons are pressed, blue
-			// otherwise.
-			// vec4.set( gamepadColor, 0, 0, 1, 1 );
 			for ( var j = 0; j < gamepad.buttons.length; ++ j ) {
 
 				if ( gamepad.buttons[ j ].pressed ) {
 
-					console.log( 'PRESSED', i, j );
-					// vec4.set( gamepadColor, gamepad.buttons[ j ].value, 0, 0, 1 );
-					break;
+					// console.log( 'PRESSED',  gamepad.buttons[ j ], i, j );
+					manageButtons( i, j, gamepad.buttons[ j ].value, gamepad.buttons[ j ].pressed );
+
+				}else {
+
+					manageButtons( i, j, gamepad.buttons[ j ].value, gamepad.buttons[ j ].pressed );
 
 				}
 
 			}
-
-			// debugGeom.drawBoxWithMatrix( gamepadMat, gamepadColor );
 
 		}
 
@@ -402,10 +425,47 @@ function updateGamepads() {
 
 }
 
+function updateGamepadPose ( pad, pose ) {
 
+	pad.quaternion.fromArray( pose.orientation );
+	pad.position.fromArray( pose.position );
+
+	if ( vrDisplay.stageParameters ) {
+
+		pad.updateMatrix();
+
+		standingMatrix.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
+		pad.applyMatrix( standingMatrix );
+
+	}
+
+}
+
+function manageButtons( handId, buttonId, intensity, pressed ) {
+
+	// handId
+	// 0 - left
+	// 1 - right
+
+	// buttonId
+	// 0 - trackpad
+	// 1 - system ( never dispatched on this layer )
+	// 2 - trigger ( intensity value from 0.5 to 1 )
+	// 3 - grip
+	// 4 - menu ( dispatch but better for menu options )
+	// switch ( buttonId ) {
+	// 	case expression:
+	//
+	// 		break;
+	// 	default:
+	//
+	// }
+
+}
 function playOnce( hand, action, timeScale ) {
 
 	var activeHand;
+
 	if ( hand === 0 ) {
 
 		activeHand = gamepadL;
