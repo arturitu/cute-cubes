@@ -29,6 +29,11 @@ var keyManager;
 var handsLoaded = false;
 var gamepadL,gamepadR;
 var standingMatrix = new THREE.Matrix4();
+var animationActiveR = 'close';
+var animationActiveL = 'close';
+var button0pressed = false;
+var button2pressed = false;
+var button3pressed = false;
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
@@ -357,6 +362,10 @@ function updateGamepads() {
 		return;
 
 	}
+
+	gamepadR.update();
+	gamepadL.update();
+
 	var gamepads = navigator.getGamepads();
 	for ( var i = 0; i < gamepads.length; ++ i ) {
 
@@ -409,7 +418,6 @@ function updateGamepads() {
 
 				if ( gamepad.buttons[ j ].pressed ) {
 
-					console.log( 'PRESSED',  gamepad.buttons[ j ], i, j );
 					manageButtons( i, j, gamepad.buttons[ j ].value, gamepad.buttons[ j ].pressed );
 
 				}else {
@@ -444,6 +452,12 @@ function updateGamepadPose ( pad, pose ) {
 
 function manageButtons( handId, buttonId, intensity, pressed ) {
 
+	if ( buttonId !== 0 && buttonId !== 2 && buttonId !== 3 ) {
+
+		return;
+
+	}
+	// console.log( handId, buttonId, intensity, pressed );
 	// handId
 	// 0 - right
 	// 1 - left
@@ -454,42 +468,86 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 	// 2 - trigger ( intensity value from 0.5 to 1 )
 	// 3 - grip
 	// 4 - menu ( dispatch but better for menu options )
-	// switch ( buttonId ) {
-	// 	case expression:
-	//
-	// 		break;
-	// 	default:
-	//
-	// }
 
-}
-function playOnce( hand, action, timeScale ) {
+	// animations for each buttonId
+	// close - trigger
+	// rock - grip
+	// thumb - trackpad
+	var animation;
+	switch ( buttonId ) {
+		case 0:
+			if ( button0pressed === pressed ) {
 
-	var activeHand;
+				return;
 
-	if ( hand === 0 ) {
+			}
+			button0pressed = pressed;
+			animation = 'thumb';
+			break;
+		case 2:
+			if ( button2pressed === pressed ) {
 
-		activeHand = gamepadL;
+				return;
 
-	}else {
+			}
+			button2pressed = pressed;
+			animation = 'close';
+			break;
+		case 3:
+			if ( button3pressed === pressed ) {
 
-		activeHand = gamepadR;
+				return;
+
+			}
+			button3pressed = pressed;
+			animation = 'rock';
+			break;
+	}
+
+	var timeScale = - 1;
+	if ( pressed ) {
+
+		timeScale = 1;
+
+	}
+	if ( animation ) {
+
+		playOnce ( handId, animation, timeScale );
 
 	}
 
-	if ( action === animationActive && blendMesh.mixer.clipAction( animationActive ).timeScale === timeScale ) {
+}
+function playOnce( hand, animation, timeScale ) {
+
+	// console.log( hand, animation, timeScale );
+	var activeHand;
+	var animationActive;
+
+	if ( hand === 0 ) {
+
+		activeHand = gamepadR;
+		animationActive = animationActiveR;
+
+	}else {
+
+		activeHand = gamepadL;
+		animationActive = animationActiveL;
+
+	}
+
+	if ( animation === animationActive && activeHand.mixer.clipAction( animationActive ).timeScale === timeScale ) {
 
 		return;
 
 	}
 
-	activeHand.mixer.clipAction( action ).loop = 2200;
-	activeHand.mixer.clipAction( action ).clampWhenFinished = true;
-	activeHand.mixer.clipAction( action ).timeScale = timeScale;
+	activeHand.mixer.clipAction( animation ).loop = 2200;
+	activeHand.mixer.clipAction( animation ).clampWhenFinished = true;
+	activeHand.mixer.clipAction( animation ).timeScale = timeScale;
 	activeHand.play ( animationActive, 0 );
-	activeHand.play ( action, 1 );
+	activeHand.play ( animation, 1 );
 
-	animationActive = action;
+	animationActive = animation;
 
 }
 
