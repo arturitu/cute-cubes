@@ -29,11 +29,14 @@ var keyManager;
 var handsLoaded = false;
 var gamepadL,gamepadR;
 var standingMatrix = new THREE.Matrix4();
-var animationActiveR = 'close';
-var animationActiveL = 'close';
-var button0pressed = false;
-var button2pressed = false;
-var button3pressed = false;
+var animationActiveR = 'rock';
+var animationActiveL = 'rock';
+var button0Lpressed = false;
+var button2Lpressed = false;
+var button3Lpressed = false;
+var button0Rpressed = false;
+var button2Rpressed = false;
+var button3Rpressed = false;
 
 //For touch controls (fallback for testing without VR)
 var mouse = new THREE.Vector2();
@@ -193,6 +196,7 @@ function init() {
 function loadHandR () {
 
 	gamepadL.castShadow = true;
+	gamepadL.material.shading = THREE.FlatShading;
 	scene.add( gamepadL );
 	// console.log( gamepadL );
 	// console.log( blendMesh.mixer.clipAction( 'close' ) );
@@ -207,6 +211,7 @@ function loadHandR () {
 function addHandR () {
 
 	gamepadR.castShadow = true;
+	gamepadR.material.shading = THREE.FlatShading;
 	scene.add( gamepadR );
 
 	handsLoaded = true;
@@ -363,8 +368,10 @@ function updateGamepads() {
 
 	}
 
-	gamepadR.update();
-	gamepadL.update();
+	var delta = clock.getDelta();
+
+	gamepadR.update( delta );
+	gamepadL.update( delta );
 
 	var gamepads = navigator.getGamepads();
 	for ( var i = 0; i < gamepads.length; ++ i ) {
@@ -445,6 +452,8 @@ function updateGamepadPose ( pad, pose ) {
 
 		standingMatrix.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
 		pad.applyMatrix( standingMatrix );
+		// pad.geometry.computeFaceNormals();
+		pad.geometry.computeVertexNormals();
 
 	}
 
@@ -473,6 +482,22 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 	// close - trigger
 	// rock - grip
 	// thumb - trackpad
+	var button0pressed;
+	var button2pressed;
+	var button3pressed;
+	if ( handId === 0 ) {
+
+		button0pressed = button0Rpressed;
+		button2pressed = button2Rpressed;
+		button3pressed = button3Rpressed;
+
+	}else {
+
+		button0pressed = button0Lpressed;
+		button2pressed = button2Lpressed;
+		button3pressed = button3Lpressed;
+
+	}
 	var animation;
 	switch ( buttonId ) {
 		case 0:
@@ -481,7 +506,15 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 				return;
 
 			}
-			button0pressed = pressed;
+			if ( handId === 0 ) {
+
+				button0Rpressed = pressed;
+
+			}else {
+
+				button0Lpressed = pressed;
+
+			}
 			animation = 'thumb';
 			break;
 		case 2:
@@ -490,7 +523,15 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 				return;
 
 			}
-			button2pressed = pressed;
+			if ( handId === 0 ) {
+
+				button2Rpressed = pressed;
+
+			}else {
+
+				button2Lpressed = pressed;
+
+			}
 			animation = 'close';
 			break;
 		case 3:
@@ -499,7 +540,15 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 				return;
 
 			}
-			button3pressed = pressed;
+			if ( handId === 0 ) {
+
+				button3Rpressed = pressed;
+
+			}else {
+
+				button3Lpressed = pressed;
+
+			}
 			animation = 'rock';
 			break;
 	}
@@ -520,7 +569,7 @@ function manageButtons( handId, buttonId, intensity, pressed ) {
 function playOnce( hand, animation, timeScale ) {
 
 	// TODO fix aramtures on blend files
-	return;
+	// return;
 	// console.log( hand, animation, timeScale );
 	var activeHand;
 	var animationActive;
@@ -542,14 +591,21 @@ function playOnce( hand, animation, timeScale ) {
 		return;
 
 	}
-
 	activeHand.mixer.clipAction( animation ).loop = 2200;
 	activeHand.mixer.clipAction( animation ).clampWhenFinished = true;
 	activeHand.mixer.clipAction( animation ).timeScale = timeScale;
 	activeHand.play ( animationActive, 0 );
 	activeHand.play ( animation, 1 );
 
-	animationActive = animation;
+	if ( hand === 0 ) {
+
+		animationActiveR = animation;
+
+	}else {
+
+		animationActiveL = animation;
+
+	}
 
 }
 
