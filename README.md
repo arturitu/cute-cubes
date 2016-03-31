@@ -1,13 +1,12 @@
-# Cute
-An HTC Vive WebVR room experience for kids (at your own risk)
+# Cute Cubes
+WebVR examples on different platforms (First demos for HTC Valve scale room)
 
-Demo - http://unboring.net/lab/cuteCubes
-
+List of examples - http://unboring.net/lab/cuteCubes
 
 [![Cute cubes for HTC Vive](/assets/share.jpg)](http://unboring.net/lab/cuteCubes)
 # About
 
-Make a WebVR API 1.0 room experience for HTC Vive using [three.js](http://www.threejs.org)
+Research of WebVR API 1.0 to be implemented on different platforms using [three.js](http://www.threejs.org) and [Blender](http://www.blender.org)
 
 # Credits
 

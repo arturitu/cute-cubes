@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8' />
+		<title>Cute Cubes / Talking / WebVR example for HTC Vive room scale</title>
+		<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
+		<link rel="shortcut icon" href="favicon.ico"/>
+		<style>
+			body {
+				background-color: #000;
+				color: #888;
+				font-family: Helvetica;
+				line-height: 26px;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			h1 {
+				color: #fff;
+				margin: 8px;
+			}
+
+			a {
+				color: #48f;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #fff;
+			}
+
+			button {
+				color: #000000;
+				border: 0px;
+				background-color: #48f;
+				padding: 5px 15px;
+				font-size: 18px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: #fff;
+			}
+
+			#container {
+				box-sizing: border-box;
+        height: 100%;
+        left: 0;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+	<div id='container'></div>
+	<script src='js/libs/three.js'></script>
+	<script src="js/WebVR.js"></script>
+	<script src='js/effects/VREffect.js'></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/controls/TouchControls.js"></script>
+	<script src="js/controls/VRControls.js"></script>
+	<script src="js/BlendCharacter.js"></script>
+	<script src="js/managers/MoodManager.js"></script>
+	<script src="js/managers/KeyManager.js"></script>
+	<script src="js/assets/CuteCubeMesh.js"></script>
+	<script src="js/assets/CuteCube.js"></script>
+	<script src="js/vive_talking.js"></script>
+	</body>
+</html>

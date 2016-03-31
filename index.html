@@ -2,102 +2,289 @@
 <html lang='en'>
 	<head>
 		<meta charset='utf-8' />
-		<title>Cute Cubes - An HTC Vive WebVR room experience for kids (at your own risk)</title>
+		<title>Cute Cubes - WebVR experiences for HTC Vive room scale</title>
 		<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
 
 		<!-- Facebook Metas -->
 		<meta property="og:url" content="http://unboring.net/lab/cuteCubes" />
 		<meta property="og:title" content="Cute cubes"/>
-		<meta property="og:description" content="An HTC Vive WebVR room experience for kids (at your own risk)"/>
+		<meta property="og:description" content="WebVR experiences for HTC Vive room scale"/>
 		<meta property="og:image" content="http://unboring.net/lab/cuteCubes/assets/share.jpg">
 
 
 		<!-- Schema.org markup for Google+ -->
 		<meta itemprop="name" content="Cute cubes">
-		<meta itemprop="description" content="An HTC Vive WebVR room experience for kids (at your own risk)">
+		<meta itemprop="description" content="WebVR experiences for HTC Vive room scale">
 		<meta itemprop="image" content="http://unboring.net/lab/cuteCubes/assets/share.jpg">
 
 		<!-- Twitter Card data -->
 		<meta property="twitter:card" content="summary" />
 		<meta property="twitter:site" content="@un_boring" />
 		<meta property="twitter:title" content="Cute cubes" />
-		<meta property="twitter:description" content="An HTC Vive WebVR room experience for kids (at your own risk)" />
+		<meta property="twitter:description" content="WebVR experiences for HTC Vive room scale" />
 		<meta property="twitter:image" content="http://unboring.net/lab/cuteCubes/assets/share.jpg" />
-		<meta property="twitter:url" content="http://awwwards.unboring.net" />
+		<meta property="twitter:url" content="http://unboring.net/lab/cuteCubes" />
 
 		<link rel="shortcut icon" href="favicon.ico"/>
+
+		<!-- Based on http://threejs.org/examples/ structure -->
 		<style>
-			body {
-				background-color: #000;
-				color: #888;
-				font-family: Helvetica;
-				line-height: 26px;
-				margin: 0px;
-				overflow: hidden;
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			height: 100%;
+		}
+
+		body {
+			background-color: #ffffff;
+			margin: 0px;
+			height: 100%;
+			font-family: Helvetica;
+			font-size: 16px;
+			line-height: 22px;
+			overflow: hidden;
+		}
+
+		h1 {
+				margin-top: 30px;
+				margin-bottom: 20px;
+				margin-left: 20px;
+				font-size: 25px;
+				color: #444;
+				font-weight: bold;
 			}
 
-			h1 {
-				color: #fff;
-				margin: 8px;
-			}
+		h2 {
+			margin-bottom: 10px;
+			font-size: 18px;
+			color: #777;
+			font-weight: normal;
+		}
 
-			a {
-				color: #48f;
-				text-decoration: none;
-			}
+		a {
+			color: #2194CE;
+			text-decoration: none;
+		}
 
-			a:hover {
-				color: #fff;
-			}
+		#panel {
+			position: fixed;
+			left: 0px;
+			width: 310px;
+			height: 100%;
+			overflow: auto;
+			background: #fafafa;
+		}
+		#panel #content {
+			padding: 0px 20px 20px 20px;
+		}
 
-			button {
-				color: #000000;
-				border: 0px;
-				background-color: #48f;
-				padding: 5px 15px;
-				font-size: 18px;
-				cursor: pointer;
-			}
+		#panel #content .link {
+			color: #2194CE;
+			text-decoration: none;
+			cursor: pointer;
+			display: block;
+		}
 
-			button:hover {
-				background-color: #fff;
-			}
+		#panel #content .selected {
+			color: #ff0000;
+		}
 
-			#container {
-				box-sizing: border-box;
-        height: 100%;
-        left: 0;
-        margin: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
+		#panel #content .link:hover {
+			text-decoration: underline;
+		}
+
+		#viewer {
+			position: absolute;
+			border: 0px;
+			left: 310px;
+			width: calc(100% - 310px);
+			height: 100%;
+			overflow: auto;
+		}
+
+		/* mobile */
+
+		#expandButton {
+			display: none;
+			position: absolute;
+			right: 20px;
+			top: 12px;
+			width: 32px;
+			height: 32px;
+		}
+
+		#expandButton span {
+			height: 2px;
+			background-color: #2194CE;
+			width: 16px;
+			position: absolute;
+			left: 8px;
+			top: 10px;
+		}
+
+		#expandButton span:nth-child(1) {
+			top: 16px;
+		}
+
+		#expandButton span:nth-child(2) {
+			top: 22px;
+		}
+
+		@media all and ( max-width: 640px ) {
+				h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#panel{
+					position: absolute;
+					left: 0;
+					top: 0;
+					height: 480px;
+					width: 100%;
+					right: 0;
+					z-index: 100;
+					overflow: hidden;
+					border-bottom: 1px solid #dedede;
+				}
+				#content{
+					position: absolute;
+					left: 0;
+					top: 90px;
+					right: 0;
+					bottom: 0;
+					font-size: 17px;
+					line-height: 22px;
+					overflow: auto;
+				}
+				#expandButton{
+					display: block;
+				}
+				#viewer{
+					position: absolute;
+					left: 0;
+					top: 56px;
+					width: 100%;
+					height: calc(100% - 56px);
+				}
+				#panel.collapsed{
+					height: 56px;
+				}
 			}
 		</style>
 	</head>
 	<body>
-	<div id='container'></div>
-	<script src='js/libs/three.js'></script>
-	<script src="js/WebVR.js"></script>
-	<script src='js/effects/VREffect.js'></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/controls/TouchControls.js"></script>
-	<script src="js/controls/VRControls.js"></script>
-	<script src="js/BlendCharacter.js"></script>
-	<script src="js/managers/MoodManager.js"></script>
-	<script src="js/managers/KeyManager.js"></script>
-	<script src="js/assets/CuteCubeMesh.js"></script>
-	<script src="js/assets/CuteCube.js"></script>
-	<script src="js/main.js"></script>
-
+	<div id="panel" class="collapsed">
+		<h1>Cute cubes <a href="https://github.com/arturitu/cute-cubes/">GitHub</a></h1>
+		<a id="expandButton" href="#">
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
+		<div id="content"></div>
+	</div>
+	<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+	<!-- Based on http://threejs.org/examples/ structure -->
+	<script src="files.js"></script>
 	<script>
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		ga('create', 'UA-71777-19', 'auto');
-		ga('send', 'pageview');
+		var panel = document.getElementById( 'panel' );
+		var content = document.getElementById( 'content' );
+		var viewer = document.getElementById( 'viewer' );
 
+		var expandButton = document.getElementById( 'expandButton' );
+		expandButton.addEventListener( 'click', function ( event ) {
+			panel.classList.toggle( 'collapsed' );
+			event.preventDefault();
+		} );
+		// iOS8 workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			viewer.addEventListener( 'load', function ( event ) {
+
+				viewer.contentWindow.innerWidth -= 10;
+				viewer.contentWindow.innerHeight -= 2;
+
+			} );
+
+		}
+
+		var container = document.createElement( 'div' );
+		content.appendChild( container );
+
+		var links = {};
+		var selected = null;
+
+		for ( var key in files ) {
+
+			var section = files[ key ];
+
+			var header = document.createElement( 'h2' );
+			header.textContent = key;
+			header.setAttribute( 'data-category', key );
+			container.appendChild( header );
+
+			for ( var i = 0; i < section.length; i ++ ) {
+
+				( function ( file ) {
+
+					var name = getName( file );
+
+					var link = document.createElement( 'a' );
+					link.className = 'link';
+					link.textContent = name;
+					link.href = "#" + file;
+					link.addEventListener( 'click', function ( event ) {
+
+						if ( event.button === 0 ) {
+
+							event.preventDefault();
+
+							panel.classList.toggle( 'collapsed' );
+							load( file );
+
+						}
+
+					} );
+					container.appendChild( link );
+
+					links[ file ] = link;
+
+				} )( section[ i ] );
+
+			}
+
+		}
+
+		var load = function ( file ) {
+
+			if ( selected !== null ) links[ selected ].className = 'link';
+
+			links[ file ].className = 'link selected';
+
+			window.location.hash = file;
+			viewer.src = file + '.html';
+			viewer.focus();
+
+			selected = file;
+
+		};
+
+		if ( window.location.hash !== '' ) {
+
+			load( window.location.hash.substring( 1 ) );
+
+		}
+
+		function getName( file ) {
+
+			var name = file.split( '_' );
+			name.shift();
+			return name.join( ' / ' );
+
+		}
 	</script>
 	</body>
 </html>
