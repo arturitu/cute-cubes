@@ -2,7 +2,7 @@
 
 var clock, container, camera, scene, renderer, controls, effect, listener, loader;
 
-var cameraSpectator, cameraAsset1, cameraAsset, rendererSpectator;
+var cameraSpectator, cameraDummy, headsetDummy, rendererSpectator;
 
 var vrMode = false;
 var vrDisplay = null;
@@ -13,7 +13,7 @@ var vrDisplay = null;
 var stage = 0;
 
 var userHeight = 1.7;
-var totalCubes = 15;
+var totalCubes = 2;
 var sky;
 var cuteCubeMesh;
 var cubesArr = [];
@@ -148,16 +148,16 @@ function init() {
 	}
 
 	//Physical camera assets
-	// cameraAsset = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 0.3 ), new THREE.MeshLambertMaterial( { color: 0x2194CE } ) );
+	// headsetDummy = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 0.3 ), new THREE.MeshLambertMaterial( { color: 0x2194CE } ) );
 
-	cameraAsset1 = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.25, 0.3 ), new THREE.MeshLambertMaterial( { color: 0x444444 } ) );
-	camera.add( cameraAsset1 );
-	scene.add( cameraAsset1 );
+	cameraDummy = new THREE.Mesh( new THREE.BoxGeometry( 0.3, 0.18, 0.1 ), new THREE.MeshLambertMaterial( { color: 0x444444 } ) );
+	camera.add( cameraDummy );
+	scene.add( cameraDummy );
 
-	cameraAsset = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.2, 0.3 ), new THREE.MeshLambertMaterial( { color: 0x2194CE } ) );
-	cameraAsset.position.set ( 2.5, 1.5, - 2.5 );
-	cameraAsset.add( cameraSpectator );
-	scene.add ( cameraAsset );
+	headsetDummy = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.2, 0.3 ), new THREE.MeshLambertMaterial( { color: 0x2194CE } ) );
+	headsetDummy.position.set ( - 2.3, 1.2,  0.7 );
+	headsetDummy.add( cameraSpectator );
+	scene.add ( headsetDummy );
 	//Sky
 	var skyGeo = new THREE.SphereGeometry( 450, 32, 15 );
 	var skyBox = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { map : new THREE.TextureLoader().load( 'assets/panoleft.png' ), side: THREE.BackSide } ) );
@@ -347,10 +347,10 @@ function render( timestamp ) {
 	}
 	rendererSpectator.render( scene, cameraSpectator );
 	var v = new THREE.Vector3();
-	v.subVectors( cameraAsset.position, camera.position ).add( cameraAsset.position );
-	cameraAsset.lookAt( v );
-	cameraAsset1.position.set( camera.position.x, camera.position.y, camera.position.z );
-	cameraAsset1.rotation.set( camera.rotation.x, camera.rotation.y, camera.rotation.z );
+	v.subVectors( headsetDummy.position, camera.position ).add( headsetDummy.position );
+	headsetDummy.lookAt( v );
+	cameraDummy.position.set( camera.position.x, camera.position.y, camera.position.z );
+	cameraDummy.rotation.set( camera.rotation.x, camera.rotation.y, camera.rotation.z );
 	// Update VR headset position and apply to camera.
 	controls.update();
 
