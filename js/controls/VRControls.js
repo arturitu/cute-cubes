@@ -25,7 +25,7 @@ THREE.VRControls = function ( object, onError ) {
 
 		}
 
-		if ( !vrInput ) {
+		if ( ! vrInput ) {
 
 			if ( onError ) onError( 'VR input not available.' );
 
@@ -111,7 +111,7 @@ THREE.VRControls = function ( object, onError ) {
 
 					object.updateMatrix();
 
-					standingMatrix.fromArray(vrInput.stageParameters.sittingToStandingTransform);
+					standingMatrix.fromArray( vrInput.stageParameters.sittingToStandingTransform );
 					object.applyMatrix( standingMatrix );
 
 				} else {
